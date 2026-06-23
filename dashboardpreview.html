@@ -330,6 +330,59 @@ html[data-theme="light"] .table tr:hover td{background:rgba(47,102,224,0.04)}
 html[data-theme="light"] .notif-pop,html[data-theme="light"] .help-panel{box-shadow:0 22px 50px rgba(40,60,110,.18)}
 html[data-theme="light"] .toast{box-shadow:0 12px 40px rgba(40,60,110,.2)}
 html[data-theme="light"] .notif-badge{border-color:#fff}
+
+/* ════════ RAG ════════ */
+.rag-layout{display:grid;grid-template-columns:280px 1fr;gap:20px;align-items:start}
+.rag-col-list{display:flex;flex-direction:column;gap:10px}
+.rag-col-card{background:var(--panel-2);border:1px solid var(--border-soft);border-radius:10px;padding:14px 16px;cursor:pointer;transition:all .18s;position:relative}
+.rag-col-card:hover{border-color:rgba(79,124,255,0.3)}
+.rag-col-card.selected{border-color:var(--cyan);background:linear-gradient(150deg,rgba(79,124,255,0.08),transparent)}
+.rag-col-name{font-size:13px;font-weight:600;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:24px}
+.rag-col-meta{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim)}
+.rag-col-del{position:absolute;top:10px;right:10px;background:none;border:none;color:var(--grey);cursor:pointer;font-size:14px;opacity:0;transition:opacity .15s;padding:2px 5px}
+.rag-col-card:hover .rag-col-del{opacity:1}
+.rag-col-del:hover{color:var(--red)}
+.rag-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:260px;gap:12px;color:var(--text-dim);font-size:13px;text-align:center}
+.rag-empty .ico{font-size:36px}
+.model-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.model-chip-sel{font-family:'Space Mono',monospace;font-size:10px;padding:6px 12px;border-radius:20px;border:1px solid var(--border-soft);background:var(--panel-2);color:var(--text-dim);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px}
+.model-chip-sel:hover{border-color:var(--cyan);color:var(--cyan)}
+.model-chip-sel.on{background:rgba(79,124,255,0.12);border-color:var(--cyan);color:var(--cyan)}
+.model-chip-sel.offline{opacity:.4;cursor:not-allowed}
+.model-chip-sel .mc-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
+.model-chip-sel.offline .mc-dot{background:var(--grey)}
+.rag-tabs{display:flex;border-bottom:1px solid var(--border-soft);margin-bottom:20px}
+.rag-tab{padding:10px 18px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.rag-tab:hover{color:var(--white)}
+.rag-tab.on{color:var(--cyan);border-bottom-color:var(--cyan)}
+.rag-tab-pane{display:none}
+.rag-tab-pane.on{display:block}
+.ingest-type-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.ingest-type-btn{padding:7px 14px;border-radius:20px;border:1px solid var(--border-soft);background:var(--panel-2);color:var(--text-dim);font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;transition:all .15s}
+.ingest-type-btn.on{border-color:var(--cyan);color:var(--cyan);background:rgba(79,124,255,0.08)}
+.doc-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:8px;background:var(--panel-2);border:1px solid var(--border-soft);margin-bottom:8px}
+.doc-ico{width:32px;height:32px;border-radius:6px;background:rgba(79,124,255,0.08);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.doc-meta{flex:1;min-width:0}
+.doc-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc-sub{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);margin-top:2px}
+.doc-del{background:none;border:none;color:var(--grey);cursor:pointer;font-size:15px;padding:4px 7px;transition:color .15s}
+.doc-del:hover{color:var(--red)}
+.rag-answer{background:rgba(79,124,255,0.04);border:1px solid rgba(79,124,255,0.15);border-radius:10px;padding:18px 20px;margin:16px 0;font-size:14px;line-height:1.7;white-space:pre-wrap;display:none}
+.rag-answer.visible{display:block}
+.rag-sources{margin-top:12px;display:none}
+.rag-sources.visible{display:block}
+.rag-source-item{border:1px solid var(--border-soft);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.rag-source-head{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;cursor:pointer;background:var(--panel-2)}
+.rag-source-head:hover{background:rgba(79,124,255,0.04)}
+.rag-source-title{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim)}
+.rag-source-score{font-family:'Space Mono',monospace;font-size:10px;color:var(--cyan)}
+.rag-source-body{display:none;padding:12px 14px;font-size:12px;line-height:1.6;color:var(--text-dim);white-space:pre-wrap;border-top:1px solid var(--border-soft)}
+.rag-source-item.open .rag-source-body{display:block}
+.rag-sending{display:none;align-items:center;gap:10px;padding:14px;color:var(--text-dim);font-size:13px}
+.rag-sending.visible{display:flex}
+.rag-spin{width:18px;height:18px;border:2px solid var(--border-soft);border-top-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:1024px){.rag-layout{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -355,6 +408,10 @@ html[data-theme="light"] .notif-badge{border-color:#fff}
       <span class="ico"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l3-4 3 2 4-6"/></svg></span>Consommation</button>
     <button class="nav-item" data-view="invoices">
       <span class="ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg></span>Factures</button>
+    <div class="nav-group-label">IA</div>
+    <button class="nav-item" data-view="rag">
+      <span class="ico"><svg viewBox="0 0 24 24"><path d="M12 2a4 4 0 0 1 4 4v1h1a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3h1V6a4 4 0 0 1 4-4z"/><circle cx="9" cy="13" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1" fill="currentColor" stroke="none"/><path d="M9 17q1.5 1.5 6 0"/></svg></span>RAG & IA
+      <span class="nav-badge" id="ragBadge" style="display:none">0</span></button>
     <div class="nav-group-label">Compte</div>
     <button class="nav-item" data-view="credits">
       <span class="ico"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span>Crédits</button>
@@ -681,6 +738,113 @@ html[data-theme="light"] .notif-badge{border-color:#fff}
         <div class="card"><div class="card-head"><div class="card-title">// historique des transactions</div></div><div id="txList"></div></div>
       </div>
 
+      <!-- ════════ RAG & IA ════════ -->
+      <div class="view" id="view-rag">
+        <!-- Stats -->
+        <div class="grid-4" style="margin-bottom:20px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px">
+          <div class="stat"><div class="stat-label">Collections</div><div class="stat-val" id="ragStatCols">—</div><div class="stat-sub" id="ragStatColsSub">chargement…</div></div>
+          <div class="stat"><div class="stat-label">Documents ingérés</div><div class="stat-val" id="ragStatDocs">—</div><div class="stat-sub">total toutes collections</div></div>
+          <div class="stat"><div class="stat-label">Modèle actif</div><div class="stat-val" style="font-size:16px" id="ragStatModel">—</div><div class="stat-sub" id="ragStatModelSub">vLLM · Node2</div></div>
+        </div>
+
+        <div class="rag-layout">
+          <!-- Colonne gauche : liste des collections -->
+          <div class="rag-col-list">
+            <button class="btn btn-primary btn-sm" onclick="ragOpenCreate()" style="width:100%;margin-bottom:4px">+ Nouvelle collection</button>
+            <div id="ragColList"><div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim);padding:10px 0">Chargement…</div></div>
+          </div>
+
+          <!-- Colonne droite : détail collection sélectionnée -->
+          <div class="card" id="ragDetail">
+            <div class="rag-empty" id="ragDetailEmpty">
+              <div class="ico">🤖</div>
+              <div>Sélectionne une collection<br>pour gérer ses documents et interroger l'IA</div>
+            </div>
+            <div id="ragDetailContent" style="display:none">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+                <div>
+                  <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Collection active</div>
+                  <div style="font-size:18px;font-weight:700" id="ragDetailName">—</div>
+                  <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim);margin-top:3px" id="ragDetailMeta">—</div>
+                </div>
+              </div>
+
+              <!-- Onglets -->
+              <div class="rag-tabs">
+                <div class="rag-tab on" data-rtab="docs" onclick="ragTab('docs')">Documents</div>
+                <div class="rag-tab" data-rtab="query" onclick="ragTab('query')">Requête</div>
+              </div>
+
+              <!-- Onglet Documents -->
+              <div class="rag-tab-pane on" id="rtab-docs">
+                <!-- Ingestion -->
+                <div class="card" style="margin-bottom:16px;background:var(--panel-2)">
+                  <div class="card-head" style="margin-bottom:12px"><div class="card-title">// ingérer un document</div></div>
+                  <div class="ingest-type-row">
+                    <button class="ingest-type-btn on" data-itype="pdf" onclick="ragSetType('pdf')">PDF</button>
+                    <button class="ingest-type-btn" data-itype="url" onclick="ragSetType('url')">URL</button>
+                    <button class="ingest-type-btn" data-itype="code" onclick="ragSetType('code')">Code</button>
+                    <button class="ingest-type-btn" data-itype="csv" onclick="ragSetType('csv')">CSV</button>
+                    <button class="ingest-type-btn" data-itype="json" onclick="ragSetType('json')">JSON</button>
+                  </div>
+                  <div id="ingestFileRow">
+                    <div class="dropzone" id="ingestDrop" onclick="$('ingestFile').click()">
+                      <div class="dropzone-ico">📎</div>
+                      <div class="dropzone-text">Glisser un fichier ou cliquer pour parcourir</div>
+                      <div class="dropzone-sub" id="ingestDropSub">PDF · max 200 MB</div>
+                    </div>
+                    <input type="file" id="ingestFile" style="display:none" onchange="ragFileChosen(this)">
+                    <div id="ingestFileChosen" style="display:none;font-family:'Space Mono',monospace;font-size:11px;color:var(--cyan);padding:6px 0"></div>
+                  </div>
+                  <div id="ingestUrlRow" style="display:none">
+                    <div class="field" style="margin-bottom:12px"><label class="field-label">URL à ingérer</label><input type="url" id="ingestUrl" placeholder="https://docs.example.com/page"></div>
+                  </div>
+                  <button class="btn btn-primary btn-sm" onclick="ragIngest()" style="width:100%">Ingérer</button>
+                </div>
+
+                <!-- Liste docs -->
+                <div id="ragDocList"><div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim)">Aucun document dans cette collection.</div></div>
+              </div>
+
+              <!-- Onglet Requête -->
+              <div class="rag-tab-pane" id="rtab-query">
+                <div style="margin-bottom:14px">
+                  <div class="card-title" style="margin-bottom:10px">// choisir un modèle</div>
+                  <div class="model-chips" id="ragModelChips"><div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim)">Chargement…</div></div>
+                </div>
+                <div class="field" style="margin-bottom:12px">
+                  <label class="field-label">Ta question</label>
+                  <textarea id="ragQuestion" rows="3" placeholder="Ex : Résume les points clés du document, Quelles sont les fonctions définies dans ce fichier…" style="width:100%;background:var(--panel-2);border:1px solid var(--border-soft);border-radius:8px;padding:12px 14px;color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:13px;resize:vertical;min-height:90px;transition:border-color .2s"></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="ragQuery()" style="width:100%;margin-bottom:16px">Interroger</button>
+
+                <div class="rag-sending" id="ragSending"><div class="rag-spin"></div>Interrogation en cours…</div>
+
+                <div class="rag-answer" id="ragAnswer"></div>
+
+                <div class="rag-sources" id="ragSources">
+                  <div class="card-title" style="margin-bottom:10px">// sources utilisées</div>
+                  <div id="ragSourceList"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal création collection -->
+        <div id="ragCreateModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:500;display:none;align-items:center;justify-content:center">
+          <div class="card" style="width:420px;max-width:92vw">
+            <div class="card-head"><div class="card-title">// nouvelle collection</div><button class="btn btn-ghost btn-sm" onclick="ragCloseCreate()">✕</button></div>
+            <div class="field"><label class="field-label">Nom</label><input type="text" id="ragNewName" placeholder="Ex : Documentation produit" maxlength="128"></div>
+            <div class="field"><label class="field-label">Description (optionnel)</label><textarea id="ragNewDesc" rows="2" placeholder="Contexte, usage…" style="width:100%;background:var(--panel-2);border:1px solid var(--border-soft);border-radius:8px;padding:10px 12px;color:var(--white);font-family:inherit;font-size:13px;resize:none"></textarea></div>
+            <div style="display:flex;gap:10px;justify-content:flex-end">
+              <button class="btn btn-ghost btn-sm" onclick="ragCloseCreate()">Annuler</button>
+              <button class="btn btn-primary btn-sm" onclick="ragCreateCol()">Créer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -713,7 +877,7 @@ const TPLNAMES={ml:'IA & LLM',genai:'IA générative',render:'Rendu 3D & VFX',sc
 const tplName=s=>TPLNAMES[s]||s;
 
 /* ═══ NAVIGATION ═══ */
-const titles={overview:"Vue d'ensemble",reserve:"Réserver un créneau",render:"Rendu 3D",sessions:"Mes sessions",files:"Fichiers",usage:"Consommation",invoices:"Factures",credits:"Crédits & recharge",profile:"Profil & clé SSH"};
+const titles={overview:"Vue d'ensemble",reserve:"Réserver un créneau",render:"Rendu 3D",sessions:"Mes sessions",files:"Fichiers",usage:"Consommation",invoices:"Factures",credits:"Crédits & recharge",profile:"Profil & clé SSH",rag:"RAG & IA"};
 function goView(v){
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
@@ -725,6 +889,7 @@ function goView(v){
   if(v==='invoices')loadInvoices();
   if(v==='render')loadRenderJobs();
   if(v==='overview')refreshOverview();
+  if(v==='rag')loadRag();
 }
 document.querySelectorAll('.nav-item').forEach(b=>b.addEventListener('click',()=>goView(b.dataset.view)));
 $('menuToggle').onclick=()=>$('sidebar').classList.toggle('open');
@@ -1117,6 +1282,183 @@ document.querySelectorAll('#helpBody .faq-q').forEach(q=>q.onclick=()=>q.parentE
 function helpSend(){const i=gid('helpInput');if(!i.value.trim())return;toast('Message envoyé — réponse par email sous 2h');i.value='';}
 gid('helpSend').onclick=helpSend;
 gid('helpInput').addEventListener('keydown',e=>{if(e.key==='Enter')helpSend();});
+
+/* ════════ RAG ════════ */
+let RAG_COLS=[],RAG_SEL=null,RAG_MODEL=null,RAG_INGEST_TYPE='pdf',RAG_MODELS=[];
+
+async function loadRag(){
+  await Promise.all([loadRagCols(),loadRagModels()]);
+  // stats
+  const total=RAG_COLS.reduce((a,c)=>a+c.doc_count,0);
+  $('ragStatCols').textContent=RAG_COLS.length;
+  $('ragStatColsSub').textContent='Quota: '+RAG_COLS.length+' / '+getColQuota();
+  $('ragStatDocs').textContent=total;
+  const avail=RAG_MODELS.filter(m=>m.available);
+  $('ragStatModel').textContent=avail.length?avail[0].label:'—';
+  $('ragStatModelSub').textContent=avail.length?avail[0].id.split('/').pop():'aucun modèle chargé';
+  const badge=$('ragBadge');badge.textContent=RAG_COLS.length;badge.style.display=RAG_COLS.length?'':'none';
+}
+
+function getColQuota(){
+  // Heuristic: if user was ever pro, show 10, otherwise 3
+  return 10;
+}
+
+async function loadRagCols(){
+  try{const r=await api('/rag/collections');if(!r.ok)return;RAG_COLS=await r.json();}catch(_){RAG_COLS=[];}
+  renderRagCols();
+}
+
+async function loadRagModels(){
+  try{const r=await api('/rag/models');if(!r.ok)return;RAG_MODELS=await r.json();}catch(_){RAG_MODELS=[];}
+}
+
+function renderRagCols(){
+  const box=$('ragColList');
+  if(!RAG_COLS.length){box.innerHTML='<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--text-dim);padding:8px 0">Aucune collection. Crée-en une !</div>';return;}
+  box.innerHTML=RAG_COLS.map(c=>`
+    <div class="rag-col-card${RAG_SEL&&RAG_SEL.id===c.id?' selected':''}" onclick="ragSelectCol('${c.id}')">
+      <button class="rag-col-del" onclick="event.stopPropagation();ragDeleteCol('${c.id}','${c.name.replace(/'/g,'\\\'')}')" title="Supprimer">✕</button>
+      <div class="rag-col-name">${c.name}</div>
+      <div class="rag-col-meta">${c.doc_count} doc${c.doc_count>1?'s':''} · ${c.chunk_count} chunks · ${fmtBytes(c.size_bytes)}</div>
+    </div>`).join('');
+}
+
+function fmtBytes(b){if(b<1024)return b+'B';if(b<1048576)return (b/1024).toFixed(0)+'KB';return (b/1048576).toFixed(1)+'MB';}
+
+async function ragSelectCol(id){
+  RAG_SEL=RAG_COLS.find(c=>c.id===id)||null;
+  renderRagCols();
+  if(!RAG_SEL){$('ragDetailEmpty').style.display='';$('ragDetailContent').style.display='none';return;}
+  $('ragDetailEmpty').style.display='none';$('ragDetailContent').style.display='';
+  $('ragDetailName').textContent=RAG_SEL.name;
+  $('ragDetailMeta').textContent=(RAG_SEL.description||'')+' · '+RAG_SEL.doc_count+' docs · '+RAG_SEL.chunk_count+' chunks · '+fmtBytes(RAG_SEL.size_bytes);
+  await loadRagDocs();
+  renderRagModels();
+}
+
+async function loadRagDocs(){
+  if(!RAG_SEL)return;
+  let docs=[];
+  try{const r=await api('/rag/collections/'+RAG_SEL.id+'/documents');if(r.ok)docs=await r.json();}catch(_){}
+  const DOC_ICO={pdf:'📄',url:'🌐',code:'💻',csv:'📊',json:'📋'};
+  const box=$('ragDocList');
+  if(!docs.length){box.innerHTML='<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--text-dim)">Aucun document — ingère un fichier ou une URL.</div>';return;}
+  box.innerHTML=docs.map(d=>`
+    <div class="doc-row">
+      <div class="doc-ico">${DOC_ICO[d.doc_type]||'📁'}</div>
+      <div class="doc-meta">
+        <div class="doc-name">${d.doc_name}</div>
+        <div class="doc-sub">${d.doc_type.toUpperCase()} · ${d.chunk_count} chunk${d.chunk_count>1?'s':''}</div>
+      </div>
+      <button class="doc-del" onclick="ragDeleteDoc('${d.doc_id}','${d.doc_name.replace(/'/g,'\\\'')}')" title="Supprimer">✕</button>
+    </div>`).join('');
+}
+
+function renderRagModels(){
+  const box=$('ragModelChips');
+  if(!RAG_MODELS.length){box.innerHTML='<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--text-dim)">Aucun modèle disponible</div>';return;}
+  box.innerHTML=RAG_MODELS.map(m=>{
+    const on=RAG_MODEL===m.id;
+    return `<div class="model-chip-sel${on?' on':''}${!m.available?' offline':''}" onclick="${m.available?'ragPickModel(\''+m.id+'\')':'void(0)'}" title="${m.vram_go}GB VRAM${!m.available?' — non chargé':''}">
+      <div class="mc-dot" style="${m.available?'':'background:var(--grey)'}"></div>${m.label}</div>`;
+  }).join('');
+  if(!RAG_MODEL&&RAG_MODELS.some(m=>m.available))RAG_MODEL=RAG_MODELS.find(m=>m.available).id,renderRagModels();
+}
+
+function ragPickModel(id){RAG_MODEL=id;renderRagModels();}
+
+function ragTab(tab){
+  document.querySelectorAll('.rag-tab').forEach(t=>t.classList.toggle('on',t.dataset.rtab===tab));
+  document.querySelectorAll('.rag-tab-pane').forEach(p=>p.classList.toggle('on',p.id==='rtab-'+tab));
+}
+
+function ragSetType(t){
+  RAG_INGEST_TYPE=t;
+  document.querySelectorAll('.ingest-type-btn').forEach(b=>b.classList.toggle('on',b.dataset.itype===t));
+  $('ingestFileRow').style.display=t==='url'?'none':'';
+  $('ingestUrlRow').style.display=t==='url'?'':'none';
+  $('ingestDropSub').textContent={'pdf':'PDF · max 200 MB','code':'Tout fichier texte / code','csv':'Fichier .csv','json':'Fichier .json'}[t]||t;
+  $('ingestFile').accept={'pdf':'.pdf','code':'','csv':'.csv',json:'.json'}[t]||'';
+  $('ingestFileChosen').style.display='none';
+  $('ingestFile').value='';
+}
+
+function ragFileChosen(inp){
+  const f=inp.files[0];if(!f)return;
+  $('ingestFileChosen').style.display='';$('ingestFileChosen').textContent='✓ '+f.name+' ('+fmtBytes(f.size)+')';
+  $('ingestDrop').style.display='none';
+}
+
+async function ragIngest(){
+  if(!RAG_SEL)return;
+  const fd=new FormData();
+  fd.append('doc_type',RAG_INGEST_TYPE);
+  if(RAG_INGEST_TYPE==='url'){
+    const url=$('ingestUrl').value.trim();if(!url){toast('Saisis une URL');return;}
+    fd.append('source',url);
+  } else {
+    const f=$('ingestFile').files[0];if(!f){toast('Choisis un fichier');return;}
+    fd.append('file',f);fd.append('source',f.name);
+  }
+  const tok=token();
+  try{
+    const r=await fetch('/api/v1/rag/collections/'+RAG_SEL.id+'/ingest',{method:'POST',headers:{Authorization:'Bearer '+tok},body:fd});
+    const d=await r.json();
+    if(!r.ok){toast('Erreur : '+(d.detail||r.status));return;}
+    toast('✓ '+d.doc_name+' · '+d.chunks+' chunks ingérés');
+    $('ingestFile').value='';$('ingestUrl').value='';$('ingestFileChosen').style.display='none';$('ingestDrop').style.display='';
+    await loadRagCols();await ragSelectCol(RAG_SEL.id);
+  }catch(e){toast('Erreur réseau');}
+}
+
+async function ragDeleteDoc(docId,name){
+  if(!confirm('Supprimer le document «'+name+'» ?'))return;
+  try{await api('/rag/collections/'+RAG_SEL.id+'/documents/'+docId,{method:'DELETE'});toast('Document supprimé');await loadRagCols();await ragSelectCol(RAG_SEL.id);}catch(_){toast('Erreur');}
+}
+
+async function ragDeleteCol(id,name){
+  if(!confirm('Supprimer la collection «'+name+'» et tous ses documents ?'))return;
+  try{await api('/rag/collections/'+id,{method:'DELETE'});toast('Collection supprimée');if(RAG_SEL&&RAG_SEL.id===id)RAG_SEL=null,$('ragDetailEmpty').style.display='',$('ragDetailContent').style.display='none';await loadRagCols();}catch(_){toast('Erreur');}
+}
+
+function ragOpenCreate(){const m=$('ragCreateModal');m.style.display='flex';$('ragNewName').focus();}
+function ragCloseCreate(){$('ragCreateModal').style.display='none';$('ragNewName').value='';$('ragNewDesc').value='';}
+
+async function ragCreateCol(){
+  const name=$('ragNewName').value.trim();if(!name){toast('Nom requis');return;}
+  try{
+    const r=await api('/rag/collections',{method:'POST',body:JSON.stringify({name,description:$('ragNewDesc').value.trim()||null})});
+    const d=await r.json();if(!r.ok){toast('Erreur : '+(d.detail||r.status));return;}
+    toast('✓ Collection créée');ragCloseCreate();await loadRagCols();ragSelectCol(d.id);
+  }catch(_){toast('Erreur réseau');}
+}
+
+async function ragQuery(){
+  if(!RAG_SEL){toast('Sélectionne une collection');return;}
+  if(!RAG_MODEL){toast('Sélectionne un modèle');return;}
+  const q=$('ragQuestion').value.trim();if(!q){toast('Pose une question');return;}
+  $('ragAnswer').classList.remove('visible');$('ragSources').classList.remove('visible');
+  $('ragSending').classList.add('visible');
+  try{
+    const r=await api('/rag/query',{method:'POST',body:JSON.stringify({collection_id:RAG_SEL.id,question:q,model_id:RAG_MODEL,top_k:5})});
+    const d=await r.json();
+    $('ragSending').classList.remove('visible');
+    if(!r.ok){toast('Erreur : '+(d.detail||r.status));return;}
+    $('ragAnswer').textContent=d.answer;$('ragAnswer').classList.add('visible');
+    if(d.sources&&d.sources.length){
+      $('ragSourceList').innerHTML=d.sources.map((s,i)=>`
+        <div class="rag-source-item">
+          <div class="rag-source-head" onclick="this.parentElement.classList.toggle('open')">
+            <span class="rag-source-title">${s.doc_name} · chunk ${s.chunk_index}</span>
+            <span class="rag-source-score">${(s.score*100).toFixed(0)}%</span>
+          </div>
+          <div class="rag-source-body">${s.text}</div>
+        </div>`).join('');
+      $('ragSources').classList.add('visible');
+    }
+  }catch(e){$('ragSending').classList.remove('visible');toast('Erreur réseau');}
+}
 
 /* ── INIT ── */
 renderCredits();renderNotifs();renderFavs();renderUsage();syncAuto();

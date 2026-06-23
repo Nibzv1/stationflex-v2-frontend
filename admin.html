@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StationFlex — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --void:#0A0E1A;--deep:#070B14;--panel:#111729;--panel-2:#18203A;
+  --border:#1C2742;--border-soft:rgba(79,124,255,0.08);
+  --cyan:#4F7CFF;--cyan-dim:rgba(79,124,255,0.12);--violet:#6366F1;
+  --green:#3DD68C;--amber:#F5B544;--red:#F77389;
+  --white:#FFFFFF;--grey:#5A6480;--text-dim:#8794AD;
+}
+html{scroll-behavior:smooth}
+body{background:var(--void);color:var(--white);font-family:'Space Grotesk',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(600px circle at 10% 6%,rgba(79,124,255,0.05),transparent 50%),
+             radial-gradient(700px circle at 90% 94%,rgba(99,102,241,0.05),transparent 50%)}
+.app{display:flex;min-height:100vh;position:relative;z-index:1}
+
+/* SIDEBAR */
+.sidebar{width:248px;flex-shrink:0;background:rgba(6,12,20,0.6);border-right:1px solid var(--border-soft);
+  backdrop-filter:blur(20px);padding:24px 16px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.brand{display:flex;align-items:center;gap:10px;padding:8px 12px 6px}
+.brand-logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;letter-spacing:2px;text-transform:uppercase}
+.brand-logo em{color:var(--cyan);font-style:normal}
+.admin-tag{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--violet);
+  background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);padding:2px 7px;border-radius:4px;margin:0 12px 22px;display:inline-block;text-transform:uppercase}
+.nav-group-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--grey);letter-spacing:2px;text-transform:uppercase;padding:0 12px;margin:16px 0 8px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:6px;color:var(--text-dim);
+  font-size:14px;font-weight:500;cursor:pointer;transition:all .18s;border:1px solid transparent;width:100%;text-align:left;background:none;font-family:inherit;margin-bottom:2px}
+.nav-item:hover{background:rgba(79,124,255,0.05);color:var(--white)}
+.nav-item.active{background:linear-gradient(90deg,rgba(79,124,255,0.12),transparent);color:var(--cyan);border-color:rgba(79,124,255,0.2);border-left:2px solid var(--cyan)}
+.nav-item svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6;flex-shrink:0}
+.nav-badge{margin-left:auto;font-family:'Space Mono',monospace;font-size:9px;padding:2px 7px;border-radius:10px}
+.badge-alert{background:rgba(247,115,137,0.15);color:var(--red);border:1px solid rgba(247,115,137,0.3)}
+.badge-info{background:var(--cyan-dim);color:var(--cyan);border:1px solid rgba(79,124,255,0.2)}
+.sidebar-foot{margin-top:auto;padding:12px}
+.user-chip{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:var(--panel);border:1px solid var(--border-soft)}
+.avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--violet),var(--cyan));
+  display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:12px;color:var(--void)}
+.user-name{font-size:13px;font-weight:500}
+.user-role{font-size:11px;color:var(--violet)}
+
+/* MAIN */
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{height:64px;flex-shrink:0;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;
+  justify-content:space-between;padding:0 32px;background:rgba(2,4,8,0.4);backdrop-filter:blur(12px);position:sticky;top:0;z-index:10}
+.page-title{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600;letter-spacing:.5px}
+.topbar-right{display:flex;align-items:center;gap:14px}
+.status-pill{display:flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim);
+  padding:6px 12px;border-radius:20px;background:var(--panel);border:1px solid var(--border-soft)}
+.dot{width:7px;height:7px;border-radius:50%}
+.dot-green{background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 1.6s infinite}
+.dot-amber{background:var(--amber);box-shadow:0 0 8px var(--amber);animation:pulse 1.6s infinite}
+.dot-red{background:var(--red);box-shadow:0 0 8px var(--red);animation:pulse 1s infinite}
+.dot-grey{background:var(--grey)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.btn{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
+  padding:10px 20px;border-radius:4px;cursor:pointer;border:1px solid rgba(79,124,255,0.25);background:transparent;color:var(--cyan);transition:all .2s}
+.btn:hover{border-color:var(--cyan);box-shadow:0 0 18px var(--cyan-dim)}
+.btn-sm{padding:7px 14px;font-size:10px}
+.btn-danger{border-color:rgba(247,115,137,0.3);color:var(--red)}
+.btn-danger:hover{border-color:var(--red);box-shadow:0 0 18px rgba(247,115,137,0.15)}
+.btn-ghost{border-color:var(--border);color:var(--text-dim)}
+.btn-ghost:hover{border-color:var(--text-dim);color:var(--white);box-shadow:none}
+.content{padding:28px 32px;flex:1}
+.view{display:none;animation:fadein .4s ease}
+.view.active{display:block}
+@keyframes fadein{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* CARDS */
+.card{background:var(--panel);border:1px solid var(--border-soft);border-radius:12px;padding:22px}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.card-title{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase}
+.grid{display:grid;gap:18px}
+.grid-2{grid-template-columns:1fr 1fr}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-4{grid-template-columns:repeat(4,1fr)}
+.grid-fleet{grid-template-columns:2fr 1fr}
+
+/* STAT TILES */
+.stat{background:var(--panel);border:1px solid var(--border-soft);border-radius:10px;padding:18px;position:relative;overflow:hidden}
+.stat-accent::before{content:'';position:absolute;top:0;left:0;bottom:0;width:2px;background:var(--cyan)}
+.stat-accent.alert::before{background:var(--red)}
+.stat-accent.gold::before{background:var(--green)}
+.stat-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--text-dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+.stat-val{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;line-height:1}
+.stat-sub{font-size:12px;color:var(--text-dim);margin-top:7px}
+.stat-sub strong{color:var(--green)}
+.stat-sub .down{color:var(--red)}
+
+/* GPU FLEET (signature) */
+.fleet{display:flex;flex-direction:column;gap:12px}
+.gpu-unit{background:var(--panel-2);border:1px solid var(--border-soft);border-radius:10px;padding:16px 18px;
+  position:relative;overflow:hidden;transition:border-color .3s}
+.gpu-unit.busy{border-color:rgba(79,124,255,0.25)}
+.gpu-unit.hot{border-color:rgba(245,181,68,0.35)}
+.gpu-unit.idle{opacity:0.7}
+.gpu-unit::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--grey)}
+.gpu-unit.busy::before{background:var(--cyan)}
+.gpu-unit.hot::before{background:var(--amber)}
+.gpu-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.gpu-id{display:flex;align-items:center;gap:10px}
+.gpu-name{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600}
+.gpu-node{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim)}
+.gpu-state{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;border-radius:4px}
+.state-busy{background:rgba(79,124,255,0.1);color:var(--cyan)}
+.state-idle{background:rgba(90,100,128,0.15);color:var(--grey)}
+.state-hot{background:rgba(245,181,68,0.12);color:var(--amber)}
+.gpu-bars{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.gbar-label{font-family:'Space Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px}
+.gbar-val{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700}
+.gbar-track{height:3px;background:rgba(79,124,255,0.08);border-radius:2px;margin-top:6px;overflow:hidden}
+.gbar-fill{height:100%;border-radius:2px;transition:width .8s;background:linear-gradient(90deg,var(--cyan),var(--violet))}
+.gbar-fill.hot{background:linear-gradient(90deg,var(--amber),var(--red))}
+.gpu-session{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);margin-top:12px;padding-top:12px;border-top:1px solid var(--border-soft)}
+.gpu-session strong{color:var(--cyan)}
+
+/* CLUSTER RING */
+.ring-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%}
+.ring{position:relative;width:200px;height:200px}
+.ring svg{transform:rotate(-90deg)}
+.ring-track{fill:none;stroke:rgba(79,124,255,0.07);stroke-width:14}
+.ring-fill{fill:none;stroke:url(#rg);stroke-width:14;stroke-linecap:round;transition:stroke-dashoffset .8s;filter:none}
+.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-val{font-family:'Space Grotesk',sans-serif;font-size:42px;font-weight:900;line-height:1}
+.ring-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;margin-top:6px}
+.ring-legend{margin-top:20px;display:flex;flex-direction:column;gap:8px;width:100%}
+.legend-row{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text-dim)}
+.legend-row .lk{display:flex;align-items:center;gap:8px}
+.legend-row strong{color:var(--white);font-family:'Space Mono',monospace}
+
+/* ALERTS / ACTIVITY */
+.feed{display:flex;flex-direction:column;gap:2px}
+.feed-row{display:flex;align-items:flex-start;gap:12px;padding:11px 4px;border-bottom:1px solid rgba(28,39,66,0.5)}
+.feed-row:last-child{border:none}
+.feed-ico{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.fi-ok{background:rgba(61,214,140,0.1)}
+.fi-warn{background:rgba(245,181,68,0.12)}
+.fi-err{background:rgba(247,115,137,0.12)}
+.fi-info{background:rgba(79,124,255,0.1)}
+.feed-body{flex:1;min-width:0}
+.feed-text{font-size:13px;line-height:1.4}
+.feed-time{font-family:'Space Mono',monospace;font-size:10px;color:var(--grey);margin-top:2px}
+
+/* CHARTS */
+.chart-wrap{width:100%}
+.chart-svg{width:100%;height:auto;display:block}
+.chart-x{font-family:'Space Mono',monospace;font-size:9px;fill:var(--grey)}
+.chart-grid-line{stroke:rgba(28,39,66,0.6);stroke-width:1}
+.bar{fill:url(#barGrad);transition:opacity .2s}
+.bar:hover{opacity:0.8}
+
+/* TABLES */
+.table{width:100%;border-collapse:collapse}
+.table th{font-family:'Space Mono',monospace;font-size:9px;color:var(--text-dim);letter-spacing:1.5px;text-transform:uppercase;
+  text-align:left;padding:12px 14px;border-bottom:1px solid var(--border-soft)}
+.table td{padding:13px 14px;border-bottom:1px solid rgba(28,39,66,0.5);font-size:13px}
+.table tr:last-child td{border-bottom:none}
+.table tr:hover td{background:rgba(79,124,255,0.02)}
+.mono{font-family:'Space Mono',monospace;font-size:12px;color:var(--text-dim)}
+.badge{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;padding:4px 10px;border-radius:4px;text-transform:uppercase;display:inline-flex;align-items:center;gap:6px}
+.badge-active{background:rgba(61,214,140,0.1);color:var(--green);border:1px solid rgba(61,214,140,0.25)}
+.badge-queued{background:rgba(245,181,68,0.1);color:var(--amber);border:1px solid rgba(245,181,68,0.25)}
+.badge-ended{background:rgba(90,100,128,0.15);color:var(--grey);border:1px solid rgba(90,100,128,0.3)}
+.badge-paid{background:rgba(79,124,255,0.1);color:var(--cyan);border:1px solid rgba(79,124,255,0.25)}
+.badge-banned{background:rgba(247,115,137,0.12);color:var(--red);border:1px solid rgba(247,115,137,0.3)}
+.umini{display:flex;align-items:center;gap:10px}
+.uav{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--violet));display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;color:var(--void);flex-shrink:0}
+
+/* SERVICES / NODES */
+.svc-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(28,39,66,0.5)}
+.svc-row:last-child{border:none}
+.svc-name{font-family:'Space Mono',monospace;font-size:13px}
+.node-card{background:var(--panel);border:1px solid var(--border-soft);border-radius:12px;padding:22px}
+.node-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.node-name{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700}
+.node-spec{font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim);margin-top:3px}
+.res-row{margin-bottom:14px}
+.res-top{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px}
+.res-top .rk{color:var(--text-dim);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase}
+.res-top .rv{font-family:'Space Mono',monospace;color:var(--white)}
+.res-bar{height:6px;background:rgba(79,124,255,0.08);border-radius:3px;overflow:hidden}
+.res-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--cyan),var(--violet))}
+.res-fill.warn{background:linear-gradient(90deg,var(--amber),var(--red))}
+
+.section-gap{margin-top:18px}
+.toast{position:fixed;bottom:28px;right:28px;z-index:1000;background:var(--panel);border:1px solid rgba(79,124,255,0.3);
+  border-left:3px solid var(--cyan);border-radius:8px;padding:14px 20px;font-size:13px;display:flex;align-items:center;gap:10px;
+  transform:translateX(400px);transition:transform .3s cubic-bezier(.2,.8,.2,1);box-shadow:0 12px 40px rgba(0,0,0,0.5)}
+.toast.show{transform:none}
+.toast.danger{border-left-color:var(--red);border-color:rgba(247,115,137,0.3)}
+.menu-toggle{display:none;background:none;border:none;color:var(--white);cursor:pointer;font-size:22px}
+
+@media(max-width:1024px){.grid-4{grid-template-columns:1fr 1fr}.grid-3,.grid-fleet,.grid-2{grid-template-columns:1fr}.gpu-bars{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){
+  .sidebar{position:fixed;left:-260px;z-index:100;transition:left .3s;box-shadow:0 0 40px rgba(0,0,0,.6)}
+  .sidebar.open{left:0}.menu-toggle{display:block}
+  .grid-4{grid-template-columns:1fr 1fr}.content{padding:18px}.topbar{padding:0 18px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ════════ ADD-ONS ADMIN — Thème B ════════ */
+.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.set-field{margin-bottom:16px}
+.set-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;display:block}
+.set-input{display:flex;align-items:center;gap:10px;background:var(--panel-2);border:1px solid var(--border-soft);border-radius:8px;padding:11px 14px;transition:border-color .2s}
+.set-input:focus-within{border-color:var(--cyan)}
+.set-input input{flex:1;background:none;border:none;color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;width:100%}
+.set-input input:focus{outline:none}
+.set-input .unit{font-family:'Space Mono',monospace;font-size:12px;color:var(--text-dim);white-space:nowrap}
+.switch{width:44px;height:24px;border-radius:13px;background:var(--panel-2);border:1px solid var(--border-soft);position:relative;cursor:pointer;transition:all .2s;flex-shrink:0}
+.switch::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:var(--grey);transition:all .2s}
+.switch.on{background:var(--cyan-dim);border-color:var(--cyan)}
+.switch.on::after{left:22px;background:var(--cyan)}
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--border-soft)}
+.set-row:last-child{border:none}
+.set-row .sr-main{flex:1}
+.set-row .sr-name{font-size:14px;font-weight:500}
+.set-row .sr-sub{font-size:12px;color:var(--text-dim);margin-top:3px}
+.maint-node{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 18px;border-radius:10px;background:var(--panel-2);border:1px solid var(--border-soft);margin-bottom:12px}
+.log-filter{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.log-chip{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:7px 13px;border-radius:6px;background:var(--panel-2);border:1px solid var(--border-soft);color:var(--text-dim);cursor:pointer;transition:all .15s}
+.log-chip:hover{color:var(--white)}
+.log-chip.on{background:var(--cyan-dim);border-color:var(--cyan);color:var(--cyan)}
+.lvl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;padding:3px 8px;border-radius:4px;text-transform:uppercase;display:inline-block}
+.lvl-info{background:var(--cyan-dim);color:var(--cyan)}
+.lvl-warn{background:rgba(245,181,68,0.12);color:var(--amber)}
+.lvl-err{background:rgba(247,115,137,0.12);color:var(--red)}
+.lvl-ok{background:rgba(61,214,140,0.1);color:var(--green)}
+.set-input input[type=date],.set-input input[type=time]{color-scheme:dark}
+.btn-save{font-family:'Space Grotesk',sans-serif;font-weight:600;letter-spacing:.3px;text-transform:none;background:var(--cyan);border:none;color:#fff}
+.btn-save:hover{box-shadow:0 6px 20px rgba(79,124,255,0.3);border:none}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-logo">Station<em>Flex</em></div></div>
+    <span class="admin-tag">● Admin Console</span>
+
+    <div class="nav-group-label">Supervision</div>
+    <button class="nav-item active" data-view="control">
+      <svg viewBox="0 0 24 24"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>Centre de contrôle</button>
+    <button class="nav-item" data-view="sessions">
+      <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Sessions actives
+      <span class="nav-badge badge-info">2</span></button>
+    <button class="nav-item" data-view="reservations">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Réservations</button>
+
+    <div class="nav-group-label">Business</div>
+    <button class="nav-item" data-view="revenue">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Revenus</button>
+    <button class="nav-item" data-view="users">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>Utilisateurs
+      <span class="nav-badge badge-info" id="usersBadge">28</span></button>
+
+    <div class="nav-group-label">Infrastructure</div>
+    <button class="nav-item" data-view="system">
+      <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>Système & nodes
+      <span class="nav-badge badge-alert">1</span></button>
+
+    <div class="nav-group-label">Configuration</div>
+    <button class="nav-item" data-view="pricing">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Tarifs &amp; alertes</button>
+    <button class="nav-item" data-view="maintenance">
+      <svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 1-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 1 5.4-5.4z"/></svg>Maintenance</button>
+    <button class="nav-item" data-view="logs">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/></svg>Logs &amp; audit</button>
+
+    <div class="sidebar-foot">
+      <div class="user-chip">
+        <div class="avatar">OP</div>
+        <div><div class="user-name">Opérateur</div><div class="user-role">Super-admin</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:14px">
+        <button class="menu-toggle" id="menuToggle">☰</button>
+        <span class="page-title" id="pageTitle">Centre de contrôle</span>
+      </div>
+      <div class="topbar-right">
+        <div class="status-pill"><span class="dot dot-green"></span>node2 online</div>
+        <div class="status-pill"><span class="dot dot-amber"></span>node1 · 78°C</div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ════════ CENTRE DE CONTRÔLE ════════ -->
+      <div class="view active" id="view-control">
+        <div class="grid grid-4" style="margin-bottom:18px">
+          <div class="stat stat-accent gold">
+            <div class="stat-label">Revenus total</div>
+            <div class="stat-val" id="ctrlRevTotal">—</div>
+            <div class="stat-sub">sessions + rendus</div>
+          </div>
+          <div class="stat stat-accent">
+            <div class="stat-label">Sessions actives</div>
+            <div class="stat-val" id="ctrlActiveSess">—</div>
+            <div class="stat-sub" id="ctrlActiveSub">GPUs en cours</div>
+          </div>
+          <div class="stat stat-accent">
+            <div class="stat-label">Utilisation cluster</div>
+            <div class="stat-val" id="clusterPct">67%</div>
+            <div class="stat-sub">moyenne sur 3 GPU</div>
+          </div>
+          <div class="stat stat-accent alert">
+            <div class="stat-label">Alertes</div>
+            <div class="stat-val" id="ctrlAlerts" style="color:var(--amber)">—</div>
+            <div class="stat-sub" id="ctrlAlertSub">GPU température</div>
+          </div>
+        </div>
+
+        <!-- GPU FLEET + RING -->
+        <div class="grid grid-fleet" style="margin-bottom:18px">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">// GPU Fleet — temps réel</div>
+              <div class="mono">3 unités · 128 Go VRAM total</div>
+            </div>
+            <div class="fleet" id="fleet"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div class="card-title">// charge cluster</div></div>
+            <div class="ring-wrap">
+              <div class="ring">
+                <svg width="200" height="200" viewBox="0 0 200 200">
+                  <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#4F7CFF"/><stop offset="100%" stop-color="#6366F1"/></linearGradient></defs>
+                  <circle class="ring-track" cx="100" cy="100" r="86"/>
+                  <circle class="ring-fill" id="ringFill" cx="100" cy="100" r="86" stroke-dasharray="540" stroke-dashoffset="178"/>
+                </svg>
+                <div class="ring-center"><div class="ring-val" id="ringVal">67%</div><div class="ring-label">cluster load</div></div>
+              </div>
+              <div class="ring-legend">
+                <div class="legend-row"><span class="lk"><span class="dot dot-green"></span>node2 · 2× 5090</span><strong>busy</strong></div>
+                <div class="legend-row"><span class="lk"><span class="dot dot-amber"></span>node1 · 3090</span><strong>busy · hot</strong></div>
+                <div class="legend-row"><span class="lk"><span class="dot dot-grey"></span>file d'attente</span><strong>1 job</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Revenue trend + activity -->
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">// revenus — 7 derniers jours</div>
+              <div class="mono" style="color:var(--green)">+ 8% semaine</div>
+            </div>
+            <div class="chart-wrap" id="weekChart"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div class="card-title">// activité système</div></div>
+            <div class="feed">
+              <div class="feed-row"><div class="feed-ico fi-warn">🌡️</div><div class="feed-body"><div class="feed-text">node1 — RTX 3090 à 78°C (seuil alerte 75°C)</div><div class="feed-time">il y a 2 min</div></div></div>
+              <div class="feed-row"><div class="feed-ico fi-ok">✓</div><div class="feed-body"><div class="feed-text">Session #4821 provisionnée — <strong style="color:var(--cyan)">alex@studio-vfx.fr</strong></div><div class="feed-time">il y a 19 min</div></div></div>
+              <div class="feed-row"><div class="feed-ico fi-info">€</div><div class="feed-body"><div class="feed-text">Paiement validé — 14,00 € (Pro · 2h)</div><div class="feed-time">il y a 19 min</div></div></div>
+              <div class="feed-row"><div class="feed-ico fi-ok">✓</div><div class="feed-body"><div class="feed-text">Session #4790 terminée — outputs archivés sur NAS</div><div class="feed-time">il y a 1 h</div></div></div>
+              <div class="feed-row"><div class="feed-ico fi-info">👤</div><div class="feed-body"><div class="feed-text">Nouvel utilisateur inscrit — <strong style="color:var(--cyan)">marie@labo-bio.fr</strong></div><div class="feed-time">il y a 3 h</div></div></div>
+              <div class="feed-row"><div class="feed-ico fi-ok">🗑️</div><div class="feed-body"><div class="feed-text">Purge RGPD — données session #4698 supprimées (72h)</div><div class="feed-time">il y a 5 h</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ SESSIONS ════════ -->
+      <div class="view" id="view-sessions">
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">// sessions en cours & file d'attente</div>
+            <button class="btn btn-ghost btn-sm" onclick="toast('Rafraîchi')">↻ Rafraîchir</button>
+          </div>
+          <table class="table">
+            <thead><tr><th>Session</th><th>Utilisateur</th><th>GPU</th><th>Tier</th><th>Fin prévue</th><th>Statut</th><th>Action</th></tr></thead>
+            <tbody id="sessionsBody">
+              <tr><td colspan="7" class="mono" style="padding:14px">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ════════ RÉSERVATIONS ════════ -->
+      <div class="view" id="view-reservations">
+        <div class="grid grid-4" style="margin-bottom:18px">
+          <div class="stat stat-accent"><div class="stat-label">Aujourd'hui</div><div class="stat-val" id="resaStatToday">—</div><div class="stat-sub">créneaux réservés</div></div>
+          <div class="stat stat-accent"><div class="stat-label">Cette semaine</div><div class="stat-val" id="resaStatWeek">—</div><div class="stat-sub">créneaux</div></div>
+          <div class="stat stat-accent"><div class="stat-label">Taux d'occupation</div><div class="stat-val" id="resaStatOcc">—</div><div class="stat-sub">réservations payées</div></div>
+          <div class="stat stat-accent"><div class="stat-label">À venir</div><div class="stat-val" id="resaStatUpcoming">—</div><div class="stat-sub">payées, non démarrées</div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">// prochaines réservations</div><div style="display:flex;gap:8px"><button class="btn btn-ghost btn-sm" onclick="exportReport('réservations','CSV')">Export CSV</button><button class="btn btn-ghost btn-sm" onclick="exportReport('réservations','PDF')">Export PDF</button></div></div>
+          <table class="table">
+            <thead><tr><th>Résa</th><th>Utilisateur</th><th>Créneau</th><th>Tier</th><th>Montant</th><th>Statut</th></tr></thead>
+            <tbody id="resaBody">
+              <tr><td colspan="6" class="mono" style="padding:14px">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ════════ REVENUS ════════ -->
+      <div class="view" id="view-revenue">
+        <div class="grid grid-4" style="margin-bottom:18px">
+          <div class="stat stat-accent gold"><div class="stat-label">Revenus sessions</div><div class="stat-val" id="revSessions">—</div><div class="stat-sub">locations GPU</div></div>
+          <div class="stat stat-accent"><div class="stat-label">Revenus rendus 3D</div><div class="stat-val" id="revRender">—</div><div class="stat-sub">jobs de rendu</div></div>
+          <div class="stat stat-accent gold"><div class="stat-label">Total général</div><div class="stat-val" id="revTotal">—</div><div class="stat-sub">toutes sources</div></div>
+          <div class="stat stat-accent"><div class="stat-label">Clients inscrits</div><div class="stat-val" id="revUsers">—</div><div class="stat-sub">comptes actifs</div></div>
+        </div>
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-head"><div class="card-title">// revenus mensuels</div></div>
+            <div class="chart-wrap" id="monthChart"></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">// répartition par tier</div></div>
+            <div style="display:flex;align-items:center;gap:28px;padding:10px 0">
+              <div class="ring" style="width:160px;height:160px;flex-shrink:0">
+                <svg width="160" height="160" viewBox="0 0 160 160">
+                  <circle class="ring-track" cx="80" cy="80" r="66" stroke-width="20"/>
+                  <circle cx="80" cy="80" r="66" fill="none" stroke="#4F7CFF" stroke-width="20" stroke-dasharray="414" stroke-dashoffset="124" transform="rotate(-90 80 80)" stroke-linecap="round"/>
+                  <circle cx="80" cy="80" r="66" fill="none" stroke="#6366F1" stroke-width="20" stroke-dasharray="414" stroke-dashoffset="290" transform="rotate(198 80 80)" stroke-linecap="round"/>
+                </svg>
+                <div class="ring-center"><div class="ring-val" style="font-size:24px">412h</div></div>
+              </div>
+              <div style="flex:1">
+                <div class="legend-row" style="margin-bottom:14px"><span class="lk"><span class="dot" style="background:var(--cyan)"></span>Pro (2× 5090)</span><strong>70%</strong></div>
+                <div class="legend-row" style="margin-bottom:14px"><span class="lk"><span class="dot" style="background:var(--violet)"></span>Starter (1× 5090)</span><strong>30%</strong></div>
+                <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border-soft);font-size:12px;color:var(--text-dim)">
+                  Le tier <strong style="color:var(--cyan)">Pro</strong> génère <strong style="color:var(--white)">1 988 €</strong> ce mois.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card section-gap">
+          <div class="card-head"><div class="card-title">// top clients</div><div style="display:flex;gap:8px"><button class="btn btn-ghost btn-sm" onclick="exportReport('revenus','CSV')">Export CSV</button><button class="btn btn-ghost btn-sm" onclick="exportReport('revenus','PDF')">Export PDF</button></div></div>
+          <table class="table">
+            <thead><tr><th>Client</th><th>Sessions</th><th>Heures</th><th>Total dépensé</th><th>Dernière session</th></tr></thead>
+            <tbody>
+              <tr><td><div class="umini"><div class="uav">AM</div>alex@studio-vfx.fr</div></td><td>14</td><td>89 h</td><td><strong>623 €</strong></td><td class="mono">aujourd'hui</td></tr>
+              <tr><td><div class="umini"><div class="uav">NK</div>nina@ml-startup.io</div></td><td>9</td><td>71 h</td><td><strong>497 €</strong></td><td class="mono">hier</td></tr>
+              <tr><td><div class="umini"><div class="uav">TD</div>thomas@indie-game.fr</div></td><td>11</td><td>52 h</td><td><strong>364 €</strong></td><td class="mono">il y a 2 j</td></tr>
+              <tr><td><div class="umini"><div class="uav">MB</div>marie@labo-bio.fr</div></td><td>6</td><td>34 h</td><td><strong>176 €</strong></td><td class="mono">aujourd'hui</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ════════ UTILISATEURS ════════ -->
+      <div class="view" id="view-users">
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title" id="usersTitle">// base utilisateurs</div>
+            <div style="display:flex;gap:8px"><button class="btn btn-ghost btn-sm" onclick="exportReport('utilisateurs','CSV')">Export CSV</button><button class="btn btn-ghost btn-sm" onclick="exportReport('utilisateurs','PDF')">Export PDF</button></div>
+          </div>
+          <table class="table">
+            <thead><tr><th>Utilisateur</th><th>Inscrit</th><th>Sessions</th><th>Total</th><th>Clé SSH</th><th>Statut</th><th>Action</th></tr></thead>
+            <tbody id="usersBody">
+              <tr><td colspan="7" class="mono" style="padding:14px">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ════════ SYSTÈME ════════ -->
+      <div class="view" id="view-system">
+        <div class="grid grid-2" style="margin-bottom:18px">
+          <!-- node2 -->
+          <div class="node-card">
+            <div class="node-head">
+              <div><div class="node-name">node2</div><div class="node-spec">Threadripper Pro 5975WX · 256 Go ECC · 2× RTX 5090</div></div>
+              <span class="badge badge-active" id="sysNode2Badge"><span class="dot dot-green"></span>Online</span>
+            </div>
+            <div class="res-row"><div class="res-top"><span class="rk">CPU</span><span class="rv">42%</span></div><div class="res-bar"><div class="res-fill" style="width:42%"></div></div></div>
+            <div class="res-row"><div class="res-top"><span class="rk">RAM</span><span class="rv">96 / 256 Go</span></div><div class="res-bar"><div class="res-fill" style="width:37%"></div></div></div>
+            <div class="res-row"><div class="res-top"><span class="rk">Disque NVMe</span><span class="rv">1.2 / 2 To</span></div><div class="res-bar"><div class="res-fill" style="width:60%"></div></div></div>
+            <div class="res-row"><div class="res-top"><span class="rk">Température GPU max</span><span class="rv" id="sysGpuTemp">—</span></div><div class="res-bar"><div class="res-fill" id="sysGpuTempBar" style="width:0%"></div></div></div>
+          </div>
+          <!-- node1 -->
+          <div class="node-card">
+            <div class="node-head">
+              <div><div class="node-name">node1</div><div class="node-spec">i9 10850K · 32 Go · RTX 3090 FE</div></div>
+              <span class="badge badge-queued"><span class="dot dot-amber"></span>Alerte temp</span>
+            </div>
+            <div class="res-row"><div class="res-top"><span class="rk">CPU</span><span class="rv">66%</span></div><div class="res-bar"><div class="res-fill" style="width:66%"></div></div></div>
+            <div class="res-row"><div class="res-top"><span class="rk">RAM</span><span class="rv">24 / 32 Go</span></div><div class="res-bar"><div class="res-fill warn" style="width:75%"></div></div></div>
+            <div class="res-row"><div class="res-top"><span class="rk">Disque NVMe</span><span class="rv">0.6 / 1 To</span></div><div class="res-bar"><div class="res-fill" style="width:60%"></div></div></div>
+            <div class="res-row"><div class="res-top"><span class="rk">Température GPU</span><span class="rv" style="color:var(--amber)">78°C ⚠</span></div><div class="res-bar"><div class="res-fill warn" style="width:78%"></div></div></div>
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-head"><div class="card-title">// services systemd</div></div>
+            <div class="svc-row"><span class="svc-name">sf-api.service</span><span class="badge badge-active"><span class="dot dot-green"></span>active</span></div>
+            <div class="svc-row"><span class="svc-name">sf-worker.service</span><span class="badge badge-active"><span class="dot dot-green"></span>active</span></div>
+            <div class="svc-row"><span class="svc-name">sf-telemetry.service</span><span class="badge badge-active"><span class="dot dot-green"></span>active</span></div>
+            <div class="svc-row"><span class="svc-name">sf-cleanup.timer</span><span class="badge badge-active"><span class="dot dot-green"></span>waiting</span></div>
+            <div class="svc-row"><span class="svc-name">postgresql · redis · caddy</span><span class="badge badge-active"><span class="dot dot-green"></span>active</span></div>
+            <div class="svc-row"><span class="svc-name">NAS Synology (NFS)</span><span class="badge badge-active"><span class="dot dot-green"></span>monté · 412 Go/1 To</span></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">// journaux récents</div></div>
+            <div class="feed">
+              <div class="feed-row"><div class="feed-ico fi-warn">⚠</div><div class="feed-body"><div class="feed-text mono" style="font-size:12px">[telemetry] node1 GPU temp 78°C &gt; threshold</div><div class="feed-time">14:32:08</div></div></div>
+              <div class="feed-row"><div class="feed-ico fi-ok">✓</div><div class="feed-body"><div class="feed-text mono" style="font-size:12px">[worker] provision_session #4821 OK (12.4s)</div><div class="feed-time">14:13:51</div></div></div>
+              <div class="feed-row"><div class="feed-ico fi-info">→</div><div class="feed-body"><div class="feed-text mono" style="font-size:12px">[api] POST /payments/webhook 200 checkout.completed</div><div class="feed-time">14:13:39</div></div></div>
+              <div class="feed-row"><div class="feed-ico fi-ok">✓</div><div class="feed-body"><div class="feed-text mono" style="font-size:12px">[cleanup] session #4790 archived → NAS retention</div><div class="feed-time">13:00:02</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ TARIFS & ALERTES ════════ -->
+      <div class="view" id="view-pricing">
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-head"><div class="card-title">// tarification</div><button class="btn btn-save btn-sm" onclick="savePricing()">Enregistrer</button></div>
+            <div class="set-field"><label class="set-label">Starter — 1× RTX 5090</label><div class="set-input"><input type="number" id="priceStarter" value="4"><span class="unit">€ / heure</span></div></div>
+            <div class="set-field"><label class="set-label">Pro — 2× RTX 5090</label><div class="set-input"><input type="number" id="pricePro" value="7"><span class="unit">€ / heure</span></div></div>
+            <div class="set-field"><label class="set-label">Rendu 3D — temps GPU réel</label><div class="set-input"><input type="number" step="0.01" id="priceRender" value="0.06"><span class="unit">€ / GPU-min</span></div></div>
+            <div class="set-field" style="margin-bottom:0"><label class="set-label">Full Node — forfait journée</label><div class="set-input"><input type="number" id="priceFull" value="280"><span class="unit">€ / jour</span></div></div>
+            <p style="font-size:11px;color:var(--text-dim);margin-top:14px;line-height:1.6">Les nouveaux tarifs s'appliquent aux réservations créées après l'enregistrement. Les sessions en cours ne sont pas impactées.</p>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">// seuils d'alerte & automatisations</div><button class="btn btn-save btn-sm" onclick="saveThresholds()">Enregistrer</button></div>
+            <div class="set-field"><label class="set-label">Alerte température GPU</label><div class="set-input"><input type="number" id="thWarn" value="75"><span class="unit">°C</span></div></div>
+            <div class="set-field"><label class="set-label">Coupure automatique (critique)</label><div class="set-input"><input type="number" id="thCrit" value="86"><span class="unit">°C</span></div></div>
+            <div class="set-row"><div class="sr-main"><div class="sr-name">Throttle auto au-dessus du seuil</div><div class="sr-sub">Réduit la fréquence GPU avant la coupure</div></div><div class="switch on" id="swThrottle" onclick="toggleSwitch('swThrottle','sf_throttle')"></div></div>
+            <div class="set-row"><div class="sr-main"><div class="sr-name">Notifier l'opérateur (email + SMS)</div><div class="sr-sub">À chaque franchissement de seuil</div></div><div class="switch on" id="swNotify" onclick="toggleSwitch('swNotify','sf_notify')"></div></div>
+            <div class="set-row"><div class="sr-main"><div class="sr-name">Bloquer les nouvelles résa si node hot</div><div class="sr-sub">Empêche d'aggraver une surchauffe</div></div><div class="switch" id="swBlock" onclick="toggleSwitch('swBlock','sf_block')"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ MAINTENANCE ════════ -->
+      <div class="view" id="view-maintenance">
+        <div class="card" style="margin-bottom:18px">
+          <div class="card-head"><div class="card-title">// disponibilité des nodes</div></div>
+          <div class="maint-node">
+            <div><div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px">node2</div><div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim);margin-top:3px">Threadripper Pro · 2× RTX 5090</div></div>
+            <div style="display:flex;align-items:center;gap:16px"><span class="badge badge-active" id="st-node2"><span class="dot dot-green"></span>En ligne</span><button class="btn btn-danger btn-sm" id="btn-node2" onclick="toggleNode('node2')">Mettre hors-ligne</button></div>
+          </div>
+          <div class="maint-node" style="margin-bottom:0">
+            <div><div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px">node1</div><div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim);margin-top:3px">i9 10850K · RTX 3090 FE</div></div>
+            <div style="display:flex;align-items:center;gap:16px"><span class="badge badge-active" id="st-node1"><span class="dot dot-green"></span>En ligne</span><button class="btn btn-danger btn-sm" id="btn-node1" onclick="toggleNode('node1')">Mettre hors-ligne</button></div>
+          </div>
+        </div>
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-head"><div class="card-title">// planifier une maintenance</div></div>
+            <div class="set-field"><label class="set-label">Node concerné</label><div class="set-input"><input type="text" id="mtNode" value="node1" style="font-weight:500"></div></div>
+            <div style="display:flex;gap:12px"><div class="set-field" style="flex:1"><label class="set-label">Date</label><div class="set-input"><input type="date" id="mtDate" value="2026-06-25"></div></div><div class="set-field" style="flex:1"><label class="set-label">Début</label><div class="set-input"><input type="time" id="mtTime" value="02:00"></div></div></div>
+            <div class="set-field"><label class="set-label">Durée estimée</label><div class="set-input"><input type="number" id="mtDur" value="2"><span class="unit">heures</span></div></div>
+            <div class="set-field"><label class="set-label">Note (visible côté client)</label><div class="set-input"><input type="text" id="mtNote" value="Maintenance refroidissement"></div></div>
+            <button class="btn btn-save btn-sm" onclick="addMaint()" style="margin-top:6px">Planifier la fenêtre</button>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">// fenêtres planifiées</div></div>
+            <div id="maintList"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ LOGS & AUDIT ════════ -->
+      <div class="view" id="view-logs">
+        <div class="card">
+          <div class="card-head"><div class="card-title">// journal d'audit & système</div><div style="display:flex;gap:8px"><button class="btn btn-ghost btn-sm" onclick="exportReport('logs','CSV')">CSV</button><button class="btn btn-ghost btn-sm" onclick="exportReport('logs','PDF')">PDF</button></div></div>
+          <div class="log-filter" id="logFilter">
+            <div class="log-chip on" data-lvl="all" onclick="filterLogs('all')">Tout</div>
+            <div class="log-chip" data-lvl="info" onclick="filterLogs('info')">Info</div>
+            <div class="log-chip" data-lvl="ok" onclick="filterLogs('ok')">Succès</div>
+            <div class="log-chip" data-lvl="warn" onclick="filterLogs('warn')">Alerte</div>
+            <div class="log-chip" data-lvl="err" onclick="filterLogs('err')">Erreur</div>
+          </div>
+          <table class="table"><thead><tr><th>Horodatage</th><th>Niveau</th><th>Source</th><th>Événement</th><th>Acteur</th></tr></thead><tbody id="logBody"></tbody></table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastIco" style="color:var(--cyan)">✓</span><span id="toastMsg">OK</span></div>
+
+<script>
+/* ═══ AUTH & API ═══ */
+const API='/api/v1';
+const tok=()=>localStorage.getItem('sf_token');
+if(!tok()){location.href='/';throw new Error('unauth');}
+const authH=()=>({'Authorization':'Bearer '+tok(),'Content-Type':'application/json'});
+async function apiFetch(path,opts={}){
+  const r=await fetch(API+path,{headers:authH(),...opts});
+  if(r.status===401||r.status===403){localStorage.removeItem('sf_token');location.href='/';throw new Error(String(r.status));}
+  return r;
+}
+
+/* ═══ NAV ═══ */
+const titles={control:"Centre de contrôle",sessions:"Sessions actives",reservations:"Réservations",
+  revenue:"Revenus",users:"Utilisateurs",system:"Système & nodes",pricing:"Tarifs & alertes",maintenance:"Maintenance",logs:"Logs & audit"};
+const VIEW_LOADERS={
+  control:()=>loadControl(),
+  sessions:()=>loadSessions(),
+  reservations:()=>loadReservations(),
+  revenue:()=>loadRevenue(),
+  users:()=>loadUsers(),
+  system:()=>loadSystem()
+};
+function goView(v){
+  document.querySelectorAll('.view').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  document.querySelector(`.nav-item[data-view="${v}"]`).classList.add('active');
+  document.getElementById('pageTitle').textContent=titles[v];
+  document.getElementById('sidebar').classList.remove('open');
+  if(VIEW_LOADERS[v])VIEW_LOADERS[v]();
+}
+document.querySelectorAll('.nav-item').forEach(b=>b.addEventListener('click',()=>goView(b.dataset.view)));
+document.getElementById('menuToggle').onclick=()=>document.getElementById('sidebar').classList.toggle('open');
+
+/* ═══ TOAST ═══ */
+let tt;
+function toast(msg,danger){
+  document.getElementById('toastMsg').textContent=msg;
+  const t=document.getElementById('toast');
+  t.className='toast show'+(danger?' danger':'');
+  document.getElementById('toastIco').textContent=danger?'⚠':'✓';
+  document.getElementById('toastIco').style.color=danger?'var(--red)':'var(--cyan)';
+  clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2800);
+}
+async function killSession(id,label){
+  if(!confirm('Arrêter la session #'+(label||id.slice(0,8))+' ?'))return;
+  try{
+    const r=await apiFetch('/admin/sessions/'+id+'/kill',{method:'POST'});
+    if(r.ok){toast('Session arrêtée — outputs archivés',true);loadSessions();}
+    else{const d=await r.json().catch(()=>({}));toast(d.detail||'Erreur kill',true);}
+  }catch(e){if(e.message!=='401'&&e.message!=='403')toast('Erreur réseau',true);}
+}
+
+/* ═══ GPU FLEET (→ /admin/telemetry/latest polling 2s) ═══ */
+let fleetTimer=null;
+function renderFleet(gpus){
+  const f=document.getElementById('fleet');if(!f)return;
+  if(!gpus||!gpus.length){f.innerHTML='<div class="mono" style="padding:14px;color:var(--text-dim)">Aucune donnée GPU (agent hors-ligne)</div>';return;}
+  f.innerHTML='';
+  let totalLoad=0;
+  gpus.forEach(g=>{
+    const hot=(g.temp_c||0)>=75;
+    const cls=hot?'hot':'busy';
+    const stateLabel=hot?'Hot':'Busy';
+    const stateCls=hot?'state-hot':'state-busy';
+    totalLoad+=g.gpu_load_pct||0;
+    const vramPct=g.vram_total_go?(g.vram_used_go/g.vram_total_go*100):0;
+    f.insertAdjacentHTML('beforeend',`
+      <div class="gpu-unit ${cls}">
+        <div class="gpu-top">
+          <div class="gpu-id"><div><div class="gpu-name">${g.name||'RTX 5090'}</div><div class="gpu-node">node2 · GPU${g.index}</div></div></div>
+          <span class="gpu-state ${stateCls}">${stateLabel}</span>
+        </div>
+        <div class="gpu-bars">
+          <div><div class="gbar-label">Load</div><div class="gbar-val">${g.gpu_load_pct}%</div><div class="gbar-track"><div class="gbar-fill ${hot?'hot':''}" style="width:${g.gpu_load_pct}%"></div></div></div>
+          <div><div class="gbar-label">VRAM</div><div class="gbar-val">${g.vram_used_go}<span style="font-size:10px;color:var(--text-dim)">/${g.vram_total_go}</span></div><div class="gbar-track"><div class="gbar-fill" style="width:${vramPct}%"></div></div></div>
+          <div><div class="gbar-label">Temp</div><div class="gbar-val" style="${hot?'color:var(--amber)':''}">${g.temp_c}°C</div><div class="gbar-track"><div class="gbar-fill ${hot?'hot':''}" style="width:${g.temp_c}%"></div></div></div>
+          <div><div class="gbar-label">Power</div><div class="gbar-val">${g.power_w}W</div><div class="gbar-track"><div class="gbar-fill" style="width:${Math.min(100,g.power_w/600*100)}%"></div></div></div>
+        </div>
+      </div>`);
+  });
+  const avg=gpus.length?Math.round(totalLoad/gpus.length):0;
+  const erv=document.getElementById('ringVal');if(erv)erv.textContent=avg+'%';
+  const ecp=document.getElementById('clusterPct');if(ecp)ecp.textContent=avg+'%';
+  const C=2*Math.PI*86;
+  const erf=document.getElementById('ringFill');if(erf)erf.style.strokeDashoffset=C*(1-avg/100);
+}
+async function pollFleet(){
+  try{const r=await apiFetch('/admin/telemetry/latest');if(r.ok){const d=await r.json();renderFleet(d.gpus||[]);}}catch(_){}
+}
+const C0=2*Math.PI*86;
+document.getElementById('ringFill').setAttribute('stroke-dasharray',C0);
+document.getElementById('ringFill').style.strokeDashoffset=C0;
+pollFleet();
+if(!fleetTimer)fleetTimer=setInterval(pollFleet,2000);
+
+/* ═══ CHARTS SVG ═══ */
+function barChart(elId,data,labels,unit){
+  const W=520,H=200,pad=28,bw=(W-pad*2)/data.length*0.55,gap=(W-pad*2)/data.length;
+  const max=Math.max(...data)*1.15;
+  let bars='',xlab='',grid='';
+  for(let i=0;i<=4;i++){const y=pad+(H-pad*2)*(i/4);grid+=`<line class="chart-grid-line" x1="${pad}" y1="${y}" x2="${W-pad}" y2="${y}"/>`;}
+  data.forEach((v,i)=>{
+    const h=(v/max)*(H-pad*2);
+    const x=pad+gap*i+(gap-bw)/2;
+    const y=H-pad-h;
+    bars+=`<rect class="bar" x="${x}" y="${y}" width="${bw}" height="${h}" rx="3"><title>${v}${unit}</title></rect>`;
+    xlab+=`<text class="chart-x" x="${x+bw/2}" y="${H-pad+14}" text-anchor="middle">${labels[i]}</text>`;
+  });
+  document.getElementById(elId).innerHTML=`
+    <svg class="chart-svg" viewBox="0 0 ${W} ${H}">
+      <defs><linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#4F7CFF"/><stop offset="100%" stop-color="#6366F1"/></linearGradient></defs>
+      ${grid}${bars}${xlab}
+    </svg>`;
+}
+barChart('weekChart',[98,124,87,156,142,178,156],['L','M','M','J','V','S','D'],'€');
+barChart('monthChart',[1420,1680,1950,2100,2310,2840],['Jan','Fév','Mar','Avr','Mai','Jun'],'€');
+</script>
+
+<script>
+/* ═══════════ ADD-ONS ADMIN — tarifs, seuils, maintenance, logs, export ═══════════ */
+const LS=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v);}catch(_){return d;}};
+const LSset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const gid=id=>document.getElementById(id);
+
+/* ── TARIFS ── */
+function savePricing(){const p={starter:+gid('priceStarter').value,pro:+gid('pricePro').value,render:+gid('priceRender').value,full:+gid('priceFull').value};LSset('sf_pricing',p);toast('Tarifs enregistrés — Starter '+p.starter+'€ · Pro '+p.pro+'€');}
+(function(){const p=LS('sf_pricing',null);if(p){gid('priceStarter').value=p.starter;gid('pricePro').value=p.pro;gid('priceRender').value=p.render;gid('priceFull').value=p.full;}})();
+
+/* ── SEUILS ── */
+function saveThresholds(){const t={warn:+gid('thWarn').value,crit:+gid('thCrit').value};LSset('sf_thresholds',t);toast('Seuils enregistrés — alerte '+t.warn+'°C · coupure '+t.crit+'°C');}
+(function(){const t=LS('sf_thresholds',null);if(t){gid('thWarn').value=t.warn;gid('thCrit').value=t.crit;}})();
+function toggleSwitch(id,key){const el=gid(id);el.classList.toggle('on');LSset(key,el.classList.contains('on'));}
+[['swThrottle','sf_throttle',true],['swNotify','sf_notify',true],['swBlock','sf_block',false]].forEach(([id,k,def])=>{const el=gid(id);if(el)el.classList.toggle('on',LS(k,def));});
+
+/* ── MAINTENANCE / NODES ── */
+let nodeState=LS('sf_nodes',{node1:true,node2:true});
+function syncNode(n){const on=nodeState[n],st=gid('st-'+n),btn=gid('btn-'+n);if(!st)return;
+  if(on){st.className='badge badge-active';st.innerHTML='<span class="dot dot-green"></span>En ligne';btn.textContent='Mettre hors-ligne';btn.className='btn btn-danger btn-sm';}
+  else{st.className='badge badge-banned';st.innerHTML='<span class="dot dot-grey"></span>Hors-ligne';btn.textContent='Remettre en ligne';btn.className='btn btn-sm';}}
+function toggleNode(n){nodeState[n]=!nodeState[n];LSset('sf_nodes',nodeState);syncNode(n);toast(n+(nodeState[n]?' remis en ligne':' mis hors-ligne — nouvelles résa bloquées'),!nodeState[n]);}
+let maints=LS('sf_maints',[{node:'node1',date:'2026-06-25',time:'02:00',dur:2,note:'Maintenance refroidissement'}]);
+const MM=['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
+function fmtDate(d){const [y,m,da]=d.split('-');return da+' '+MM[+m-1]+' '+y;}
+function renderMaints(){const box=gid('maintList');if(!box)return;box.innerHTML=maints.length?maints.map((m,i)=>'<div class="svc-row"><div><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:500;font-size:13px">'+m.node+' · '+m.note+'</div><div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--text-dim);margin-top:3px">'+fmtDate(m.date)+' · '+m.time+' · '+m.dur+'h</div></div><button class="btn btn-ghost btn-sm" onclick="rmMaint('+i+')">Annuler</button></div>').join(''):'<div class="mono" style="padding:10px 0">Aucune fenêtre planifiée</div>';}
+function addMaint(){maints.unshift({node:gid('mtNode').value,date:gid('mtDate').value,time:gid('mtTime').value,dur:+gid('mtDur').value,note:gid('mtNote').value});LSset('sf_maints',maints);renderMaints();toast('Maintenance planifiée — clients notifiés');}
+function rmMaint(i){maints.splice(i,1);LSset('sf_maints',maints);renderMaints();}
+
+/* ── LOGS & AUDIT ── */
+const LOGS=[
+ {ts:'14:32:08',lvl:'warn',src:'telemetry',msg:'node1 GPU temp 78°C > seuil 75°C',actor:'system'},
+ {ts:'14:13:51',lvl:'ok',src:'worker',msg:'provision_session #4821 OK (12.4s)',actor:'system'},
+ {ts:'14:13:39',lvl:'info',src:'api',msg:'POST /payments/webhook 200 checkout.completed',actor:'stripe'},
+ {ts:'14:02:10',lvl:'info',src:'auth',msg:'connexion réussie',actor:'alex@studio-vfx.fr'},
+ {ts:'13:48:55',lvl:'err',src:'worker',msg:'échec montage NFS sur node1 (retry OK)',actor:'system'},
+ {ts:'13:30:02',lvl:'ok',src:'cleanup',msg:'session #4790 archivée → NAS retention',actor:'system'},
+ {ts:'12:58:14',lvl:'info',src:'admin',msg:'tarif Pro modifié 6€ → 7€',actor:'opérateur'},
+ {ts:'11:20:41',lvl:'warn',src:'billing',msg:'empreinte bancaire proche du plafond (#4830)',actor:'system'},
+ {ts:'09:05:00',lvl:'ok',src:'systemd',msg:'sf-api.service redémarré (deploy)',actor:'opérateur'}
+];
+const LVL={info:['lvl-info','Info'],ok:['lvl-ok','Succès'],warn:['lvl-warn','Alerte'],err:['lvl-err','Erreur']};
+let logFilterVal='all';
+function renderLogs(){const tb=gid('logBody');if(!tb)return;const rows=LOGS.filter(l=>logFilterVal==='all'||l.lvl===logFilterVal);tb.innerHTML=rows.map(l=>'<tr><td class="mono">'+l.ts+'</td><td><span class="lvl '+LVL[l.lvl][0]+'">'+LVL[l.lvl][1]+'</span></td><td class="mono">'+l.src+'</td><td>'+l.msg+'</td><td class="mono">'+l.actor+'</td></tr>').join('')||'<tr><td colspan="5" class="mono" style="padding:16px">Aucun événement</td></tr>';}
+function filterLogs(v){logFilterVal=v;document.querySelectorAll('#logFilter .log-chip').forEach(c=>c.classList.toggle('on',c.dataset.lvl===v));renderLogs();}
+
+/* ── EXPORT ── */
+function exportReport(name,fmt){toast('Rapport « '+name+' » exporté en '+fmt);}
+
+/* ── INIT ── */
+syncNode('node1');syncNode('node2');renderMaints();renderLogs();
+</script>
+
+<script>
+/* ═══════════ API LOAD FUNCTIONS ═══════════ */
+
+/* ── CONTROL (dashboard overview) ── */
+async function loadControl(){
+  try{
+    const [rr,rv,rs]=await Promise.all([
+      apiFetch('/admin/telemetry/latest'),
+      apiFetch('/admin/revenue'),
+      apiFetch('/admin/sessions')
+    ]);
+    if(rv.ok){
+      const d=await rv.json();
+      const e=document.getElementById('ctrlRevTotal');if(e)e.textContent=(d.total_cents/100).toFixed(0)+' €';
+    }
+    if(rs.ok){
+      const d=await rs.json();
+      const e=document.getElementById('ctrlActiveSess');if(e)e.textContent=d.length+' / 2 GPU';
+    }
+    if(rr.ok){
+      const d=await rr.json();
+      renderFleet(d.gpus||[]);
+      const hot=(d.gpus||[]).filter(g=>g.temp_c>=75).length;
+      const ea=document.getElementById('ctrlAlerts');if(ea)ea.textContent=hot;
+      const es=document.getElementById('ctrlAlertSub');if(es)es.textContent=hot?'GPU(s) température élevée':'Aucune alerte';
+    }
+  }catch(_){}
+}
+
+/* ── SESSIONS ACTIVES ── */
+async function loadSessions(){
+  const tb=document.getElementById('sessionsBody');if(!tb)return;
+  tb.innerHTML='<tr><td colspan="7" class="mono" style="padding:14px">Chargement…</td></tr>';
+  try{
+    const r=await apiFetch('/admin/reservations');
+    if(!r.ok){tb.innerHTML='<tr><td colspan="7" class="mono" style="padding:14px">Erreur serveur</td></tr>';return;}
+    const all=await r.json();
+    const active=all.filter(x=>x.status==='ACTIVE'||x.status==='PROVISIONING');
+    if(!active.length){tb.innerHTML='<tr><td colspan="7" class="mono" style="padding:14px">Aucune session active</td></tr>';return;}
+    tb.innerHTML=active.map(x=>{
+      const end=new Date(x.end_at);
+      const rem=Math.max(0,Math.floor((end-Date.now())/60000));
+      const hm=end.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+      const init=(x.user_email||'??').slice(0,2).toUpperCase();
+      const gpu=x.tier==='pro'?'5090 ×2':'5090 ×1';
+      return `<tr>
+        <td class="mono">${x.id.slice(0,8)}</td>
+        <td><div class="umini"><div class="uav">${init}</div>${x.user_email||'—'}</div></td>
+        <td class="mono">${gpu} · node2</td><td>${x.tier}</td>
+        <td class="mono">${hm} (${rem}min)</td>
+        <td><span class="badge badge-active"><span class="dot dot-green"></span>${x.status}</span></td>
+        <td><button class="btn btn-danger btn-sm" onclick="killSession('${x.id}','${x.id.slice(0,8)}')">Kill</button></td>
+      </tr>`;
+    }).join('');
+  }catch(_){tb.innerHTML='<tr><td colspan="7" class="mono" style="padding:14px">Erreur réseau</td></tr>';}
+}
+
+/* ── RÉSERVATIONS ── */
+const BADGE_CLS={ACTIVE:'badge-active',PAID:'badge-paid',PENDING_PAYMENT:'badge-ended',PROVISIONING:'badge-paid',ENDED:'badge-ended',CANCELLED:'badge-ended',FAILED:'badge-ended'};
+async function loadReservations(){
+  const tb=document.getElementById('resaBody');if(!tb)return;
+  tb.innerHTML='<tr><td colspan="6" class="mono" style="padding:14px">Chargement…</td></tr>';
+  try{
+    const r=await apiFetch('/admin/reservations');
+    if(!r.ok){tb.innerHTML='<tr><td colspan="6" class="mono" style="padding:14px">Erreur serveur</td></tr>';return;}
+    const all=await r.json();
+    const today=new Date();today.setHours(0,0,0,0);
+    const week=new Date(Date.now()-7*864e5);
+    const paid=all.filter(x=>['PAID','ACTIVE','PROVISIONING','ENDED'].includes(x.status));
+    const occ=all.length?Math.round(paid.length/all.length*100):0;
+    const upcoming=all.filter(x=>x.status==='PAID');
+    const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+    set('resaStatToday',all.filter(x=>new Date(x.start_at)>=today).length);
+    set('resaStatWeek',all.filter(x=>new Date(x.start_at)>=week).length);
+    set('resaStatOcc',occ+'%');
+    set('resaStatUpcoming',upcoming.length);
+    if(!all.length){tb.innerHTML='<tr><td colspan="6" class="mono" style="padding:14px">Aucune réservation</td></tr>';return;}
+    tb.innerHTML=all.slice(0,25).map(x=>{
+      const per=new Date(x.start_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'})+' · '+
+        new Date(x.start_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'–'+
+        new Date(x.end_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+      const cls=BADGE_CLS[x.status]||'badge-ended';
+      return `<tr><td class="mono">${x.id.slice(0,8)}</td><td>${x.user_email||'—'}</td><td>${per}</td><td>${x.tier}</td><td>${(x.amount_cents/100).toFixed(2)} €</td><td><span class="badge ${cls}">${x.status}</span></td></tr>`;
+    }).join('');
+  }catch(_){tb.innerHTML='<tr><td colspan="6" class="mono" style="padding:14px">Erreur réseau</td></tr>';}
+}
+
+/* ── REVENUS ── */
+async function loadRevenue(){
+  try{
+    const r=await apiFetch('/admin/revenue');if(!r.ok)return;
+    const d=await r.json();
+    const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+    set('revSessions',(d.sessions_cents/100).toFixed(0)+' €');
+    set('revRender',(d.render_cents/100).toFixed(0)+' €');
+    set('revTotal',(d.total_cents/100).toFixed(0)+' €');
+  }catch(_){}
+}
+
+/* ── UTILISATEURS ── */
+async function loadUsers(){
+  const tb=document.getElementById('usersBody');if(!tb)return;
+  tb.innerHTML='<tr><td colspan="7" class="mono" style="padding:14px">Chargement…</td></tr>';
+  try{
+    const r=await apiFetch('/admin/users');
+    if(!r.ok){tb.innerHTML='<tr><td colspan="7" class="mono" style="padding:14px">Erreur serveur</td></tr>';return;}
+    const users=await r.json();
+    const badge=document.getElementById('usersBadge');if(badge)badge.textContent=users.length;
+    const title=document.getElementById('usersTitle');if(title)title.textContent='// base utilisateurs — '+users.length+' comptes';
+    const revU=document.getElementById('revUsers');if(revU)revU.textContent=users.length;
+    tb.innerHTML=users.map(u=>{
+      const init=u.email.slice(0,2).toUpperCase();
+      const created=new Date(u.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
+      const adminBadge=u.is_admin?'<span class="badge badge-active">Admin</span>':'<span class="badge badge-paid">Actif</span>';
+      const action=!u.is_admin?`<button class="btn btn-ghost btn-sm" onclick="promoteUser('${u.id}','${u.email}')">Promouvoir</button>`:'';
+      return `<tr>
+        <td><div class="umini"><div class="uav">${init}</div>${u.email}</div></td>
+        <td class="mono">${created}</td>
+        <td>—</td><td>—</td>
+        <td>${u.ssh_public_key?'<span style="color:var(--green)">✓</span>':'<span style="color:var(--grey)">—</span>'}</td>
+        <td>${adminBadge}</td>
+        <td>${action}</td>
+      </tr>`;
+    }).join('');
+  }catch(_){tb.innerHTML='<tr><td colspan="7" class="mono" style="padding:14px">Erreur réseau</td></tr>';}
+}
+async function promoteUser(id,email){
+  if(!confirm('Promouvoir '+email+' en admin ?'))return;
+  try{
+    const r=await apiFetch('/admin/users/'+id+'/promote',{method:'POST'});
+    if(r.ok){toast('Compte '+email+' promu admin');loadUsers();}
+    else{const d=await r.json().catch(()=>({}));toast(d.detail||'Erreur',true);}
+  }catch(_){toast('Erreur réseau',true);}
+}
+
+/* ── SYSTÈME ── */
+async function loadSystem(){
+  try{
+    const r=await apiFetch('/admin/system');if(!r.ok)return;
+    const d=await r.json();
+    const n2up=d.node2?.status==='up';
+    const n2badge=document.getElementById('sysNode2Badge');
+    if(n2badge){
+      n2badge.className='badge '+(n2up?'badge-active':'badge-banned');
+      n2badge.innerHTML=n2up?'<span class="dot dot-green"></span>Online':'<span class="dot dot-grey"></span>Hors-ligne';
+    }
+    if(d.gpu?.gpus?.length){
+      const maxTemp=Math.max(...d.gpu.gpus.map(g=>g.temp_c||0));
+      const el=document.getElementById('sysGpuTemp');
+      if(el){el.textContent=maxTemp+'°C';el.style.color=maxTemp>=75?'var(--amber)':'';}
+      const bar=document.getElementById('sysGpuTempBar');
+      if(bar){bar.style.width=Math.min(100,maxTemp)+'%';if(maxTemp>=75)bar.classList.add('warn');else bar.classList.remove('warn');}
+    }
+  }catch(_){}
+}
+
+/* ── INIT: charge le dashboard au démarrage ── */
+loadControl();
+</script>
+</body>
+</html>

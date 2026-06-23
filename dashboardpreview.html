@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StationFlex — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --void:#0A0E1A;--deep:#070B14;--panel:#111729;--panel-2:#18203A;
+  --border:#1C2742;--border-soft:rgba(79,124,255,0.08);
+  --cyan:#4F7CFF;--cyan-dim:rgba(79,124,255,0.12);--cyan-glow:rgba(79,124,255,0.4);--violet:#6366F1;
+  --green:#3DD68C;--amber:#F5B544;--red:#F77389;
+  --white:#FFFFFF;--grey:#5A6480;--text-dim:#8794AD;
+}
+html{scroll-behavior:smooth}
+body{background:var(--void);color:var(--white);font-family:'Space Grotesk',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(600px circle at 12% 8%,rgba(79,124,255,0.05),transparent 50%),
+             radial-gradient(700px circle at 88% 92%,rgba(99,102,241,0.05),transparent 50%)}
+.app{display:flex;min-height:100vh;position:relative;z-index:1}
+
+/* SIDEBAR */
+.sidebar{width:248px;flex-shrink:0;background:rgba(6,12,20,0.6);border-right:1px solid var(--border-soft);
+  backdrop-filter:blur(20px);padding:24px 16px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.brand{display:flex;align-items:center;gap:10px;padding:8px 12px 28px}
+.brand-logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;letter-spacing:2px;text-transform:uppercase}
+.brand-logo em{color:var(--cyan);font-style:normal}
+.nav-group-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--grey);letter-spacing:2px;text-transform:uppercase;padding:0 12px;margin:18px 0 8px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:6px;color:var(--text-dim);
+  font-size:14px;font-weight:500;cursor:pointer;transition:all .18s;border:1px solid transparent;width:100%;text-align:left;background:none;font-family:inherit;margin-bottom:2px}
+.nav-item:hover{background:rgba(79,124,255,0.05);color:var(--white)}
+.nav-item.active{background:linear-gradient(90deg,rgba(79,124,255,0.12),transparent);color:var(--cyan);border-color:rgba(79,124,255,0.2);border-left:2px solid var(--cyan)}
+.nav-item .ico{width:18px;height:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.nav-item svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6}
+.nav-badge{margin-left:auto;font-family:'Space Mono',monospace;font-size:9px;background:var(--cyan-dim);color:var(--cyan);padding:2px 7px;border-radius:10px;border:1px solid rgba(79,124,255,0.2)}
+.sidebar-foot{margin-top:auto;padding:12px}
+.user-chip{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:var(--panel);border:1px solid var(--border-soft)}
+.avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--cyan),var(--violet));
+  display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;color:var(--void)}
+.user-meta{overflow:hidden}
+.user-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-email{font-size:11px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* MAIN */
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{height:64px;flex-shrink:0;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;background:rgba(2,4,8,0.4);backdrop-filter:blur(12px);position:sticky;top:0;z-index:10}
+.page-title{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600;letter-spacing:.5px}
+.topbar-right{display:flex;align-items:center;gap:18px}
+.status-pill{display:flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim);
+  padding:6px 12px;border-radius:20px;background:var(--panel);border:1px solid var(--border-soft)}
+.dot{width:7px;height:7px;border-radius:50%}
+.dot-green{background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 1.6s infinite}
+.dot-amber{background:var(--amber);box-shadow:0 0 8px var(--amber)}
+.dot-grey{background:var(--grey)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.btn{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
+  padding:10px 20px;border-radius:4px;cursor:pointer;border:1px solid rgba(79,124,255,0.25);background:transparent;color:var(--cyan);transition:all .2s}
+.btn:hover{border-color:var(--cyan);box-shadow:0 0 18px var(--cyan-dim)}
+.btn-primary{background:linear-gradient(135deg,var(--cyan),var(--violet));border:none;color:var(--void)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(79,124,255,0.35)}
+.btn-sm{padding:7px 14px;font-size:10px}
+.btn-ghost{border-color:var(--border);color:var(--text-dim)}
+.btn-ghost:hover{border-color:var(--text-dim);color:var(--white);box-shadow:none}
+.content{padding:32px;flex:1}
+.view{display:none;animation:fadein .4s ease}
+.view.active{display:block}
+@keyframes fadein{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* CARDS */
+.card{background:var(--panel);border:1px solid var(--border-soft);border-radius:12px;padding:24px}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.card-title{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase}
+.grid{display:grid;gap:20px}
+.grid-2{grid-template-columns:1.3fr 1fr}
+
+/* ACTIVE SESSION + GAUGE */
+.session-card{background:linear-gradient(150deg,rgba(13,24,40,0.9),rgba(10,18,32,0.9));border:1px solid rgba(79,124,255,0.18);
+  border-radius:14px;padding:28px;position:relative;overflow:hidden}
+.session-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--violet),transparent)}
+.session-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px}
+.session-tag{font-family:'Space Mono',monospace;font-size:10px;color:var(--cyan);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.session-name{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700}
+.badge{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;padding:5px 12px;border-radius:4px;text-transform:uppercase;display:inline-flex;align-items:center;gap:6px}
+.badge-active{background:rgba(61,214,140,0.1);color:var(--green);border:1px solid rgba(61,214,140,0.25)}
+.badge-ended{background:rgba(90,100,128,0.15);color:var(--grey);border:1px solid rgba(90,100,128,0.3)}
+.badge-paid{background:rgba(79,124,255,0.1);color:var(--cyan);border:1px solid rgba(79,124,255,0.25)}
+.session-body{display:grid;grid-template-columns:auto 1fr;gap:36px;align-items:center}
+.gauge{position:relative;width:180px;height:180px;flex-shrink:0}
+.gauge svg{transform:rotate(-90deg)}
+.gauge-track{fill:none;stroke:rgba(79,124,255,0.08);stroke-width:10}
+.gauge-fill{fill:none;stroke:url(#gaugeGrad);stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset .8s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 0 6px rgba(79,124,255,0.5))}
+.gauge-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gauge-val{font-family:'Space Grotesk',sans-serif;font-size:38px;font-weight:900;line-height:1}
+.gauge-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;margin-top:4px}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.metric{background:rgba(2,4,8,0.5);border:1px solid var(--border-soft);border-radius:8px;padding:14px 16px}
+.metric-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.metric-val{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700}
+.metric-val small{font-size:12px;color:var(--text-dim);font-weight:400}
+.metric-bar{height:3px;background:rgba(79,124,255,0.1);border-radius:2px;margin-top:8px;overflow:hidden}
+.metric-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--violet));border-radius:2px;transition:width .6s}
+.countdown{margin-top:24px;padding-top:24px;border-top:1px solid var(--border-soft);display:flex;align-items:center;justify-content:space-between}
+.countdown-time{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;color:var(--cyan)}
+.countdown-label{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase}
+.conn-row{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap}
+.conn-box{flex:1;min-width:240px;background:rgba(2,4,8,0.6);border:1px solid var(--border-soft);border-radius:8px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.conn-info{overflow:hidden}
+.conn-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.conn-cmd{font-family:'Space Mono',monospace;font-size:12px;color:var(--cyan);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* EXTEND PANEL */
+.extend-panel{margin-top:16px;padding:18px 20px;border-radius:10px;background:rgba(2,4,8,0.5);border:1px solid rgba(79,124,255,0.18);
+  display:none;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.extend-panel.show{display:flex}
+.extend-info{font-size:13px;color:var(--text-dim)}
+.extend-info strong{color:var(--white)}
+.extend-free{font-family:'Space Mono',monospace;font-size:10px;color:var(--green);margin-top:4px}
+
+/* STAT TILES */
+.stat{background:var(--panel);border:1px solid var(--border-soft);border-radius:10px;padding:20px;position:relative;overflow:hidden}
+.stat-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--text-dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px}
+.stat-val{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;line-height:1}
+.stat-sub{font-size:12px;color:var(--text-dim);margin-top:8px}
+.stat-sub strong{color:var(--green)}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+
+/* STEPPER */
+.stepper{display:inline-flex;align-items:center;gap:0;border:1px solid var(--border-soft);border-radius:8px;overflow:hidden;background:var(--panel-2)}
+.step-btn{width:34px;height:34px;background:none;border:none;color:var(--cyan);font-size:18px;cursor:pointer;transition:background .15s;font-family:inherit}
+.step-btn:hover{background:rgba(79,124,255,0.1)}
+.step-btn:disabled{color:var(--grey);cursor:not-allowed}
+.dur-val{min-width:46px;text-align:center;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700}
+
+/* CALENDAR */
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.cal-month{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;letter-spacing:1px}
+.cal-nav{display:flex;gap:8px}
+.cal-nav button{width:32px;height:32px;border-radius:6px;background:var(--panel-2);border:1px solid var(--border-soft);color:var(--text-dim);cursor:pointer;font-size:14px;transition:all .2s}
+.cal-nav button:hover{border-color:var(--cyan);color:var(--cyan)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-dow{font-family:'Space Mono',monospace;font-size:9px;color:var(--grey);text-align:center;padding:6px 0;letter-spacing:1px;text-transform:uppercase}
+.cal-day{aspect-ratio:1;border-radius:8px;background:var(--panel-2);border:1px solid var(--border-soft);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;cursor:pointer;transition:all .18s;position:relative;font-size:14px;font-weight:500}
+.cal-day:hover:not(.disabled){border-color:var(--cyan);background:rgba(79,124,255,0.06)}
+.cal-day.disabled{opacity:0.25;cursor:not-allowed}
+.cal-day.selected{background:linear-gradient(135deg,rgba(79,124,255,0.2),rgba(99,102,241,0.2));border-color:var(--cyan)}
+.cal-day .avail-dot{position:absolute;bottom:7px;width:5px;height:5px;border-radius:50%;background:var(--green)}
+.cal-day.full .avail-dot{background:var(--red)}
+.slots-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.slot{padding:12px 8px;border-radius:8px;text-align:center;cursor:pointer;background:var(--panel-2);border:1px solid var(--border-soft);
+  font-family:'Space Mono',monospace;font-size:13px;transition:all .12s}
+.slot:hover:not(.taken){border-color:var(--cyan);color:var(--cyan)}
+.slot.taken{opacity:0.3;cursor:not-allowed;text-decoration:line-through}
+.slot.in-span{background:rgba(79,124,255,0.08);border-color:rgba(79,124,255,0.35);color:var(--cyan)}
+.slot.picked{background:rgba(79,124,255,0.2);border-color:var(--cyan);color:var(--cyan)}
+.duration-row{display:flex;align-items:center;gap:14px;margin-top:18px;flex-wrap:wrap}
+.dur-label{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase}
+.dur-max{font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim)}
+
+/* TEMPLATE SELECTOR */
+.tpl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.tpl-card{background:var(--panel-2);border:1px solid var(--border-soft);border-radius:12px;padding:18px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.tpl-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--cyan),var(--violet));opacity:0;transition:opacity .2s}
+.tpl-card:hover{border-color:rgba(79,124,255,0.3)}
+.tpl-card.picked{border-color:var(--cyan);background:linear-gradient(150deg,rgba(79,124,255,0.08),transparent)}
+.tpl-card.picked::before{opacity:1}
+.tpl-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.tpl-name{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600}
+.tpl-check{width:20px;height:20px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--void);flex-shrink:0;transition:all .2s}
+.tpl-card.picked .tpl-check{background:var(--cyan);border-color:var(--cyan)}
+.tpl-tools{font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim);line-height:1.5;margin-bottom:14px}
+.tpl-models-label{font-family:'Space Mono',monospace;font-size:8px;color:var(--grey);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px}
+.tpl-models{display:flex;flex-wrap:wrap;gap:5px}
+.model-chip{font-family:'Space Mono',monospace;font-size:10px;color:var(--cyan);background:rgba(79,124,255,0.07);
+  border:1px solid rgba(79,124,255,0.18);padding:3px 9px;border-radius:20px;display:inline-flex;align-items:center;gap:5px}
+.model-chip::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green)}
+.tpl-note{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);font-style:italic}
+.tpl-note.warn{color:var(--amber)}
+.tpl-badge-render{margin-top:10px;font-family:'Space Mono',monospace;font-size:9px;color:var(--violet);background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.3);padding:3px 9px;border-radius:4px;display:inline-block}
+
+/* TIERS */
+.tiers{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tier{padding:18px;border-radius:10px;cursor:pointer;background:var(--panel-2);border:1px solid var(--border-soft);transition:all .2s}
+.tier:hover{border-color:rgba(79,124,255,0.3)}
+.tier.picked{border-color:var(--cyan);background:linear-gradient(150deg,rgba(79,124,255,0.08),transparent)}
+.tier-name{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.tier-price{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:900}
+.tier-price small{font-size:12px;color:var(--text-dim);font-weight:400}
+.tier-specs{font-size:11px;color:var(--text-dim);margin-top:10px;line-height:1.6}
+.checkout-bar{margin-top:20px;padding:18px 20px;border-radius:10px;background:linear-gradient(150deg,rgba(13,24,40,0.95),rgba(10,18,32,0.95));
+  border:1px solid rgba(79,124,255,0.2);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.checkout-summary{font-size:13px;color:var(--text-dim)}
+.checkout-summary strong{color:var(--white);font-family:'Space Mono',monospace}
+.checkout-total{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:900;color:var(--cyan)}
+
+/* TABLES */
+.table{width:100%;border-collapse:collapse}
+.table th{font-family:'Space Mono',monospace;font-size:9px;color:var(--text-dim);letter-spacing:1.5px;text-transform:uppercase;text-align:left;padding:12px 16px;border-bottom:1px solid var(--border-soft)}
+.table td{padding:14px 16px;border-bottom:1px solid rgba(28,39,66,0.5);font-size:13px}
+.table tr:last-child td{border-bottom:none}
+.table tr:hover td{background:rgba(79,124,255,0.02)}
+.mono{font-family:'Space Mono',monospace;font-size:12px;color:var(--text-dim)}
+.link{color:var(--cyan);text-decoration:none;font-size:12px;cursor:pointer}
+.link:hover{text-decoration:underline}
+
+/* FILES / RENDER ROWS */
+.file-row{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:8px;background:var(--panel-2);border:1px solid var(--border-soft);margin-bottom:8px;transition:border-color .2s}
+.file-row:hover{border-color:rgba(79,124,255,0.25)}
+.file-ico{width:36px;height:36px;border-radius:7px;background:rgba(79,124,255,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px}
+.file-meta{flex:1;min-width:0}
+.file-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file-sub{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);margin-top:2px}
+.retention{font-family:'Space Mono',monospace;font-size:10px;color:var(--amber);white-space:nowrap}
+.dropzone{border:1.5px dashed rgba(79,124,255,0.25);border-radius:12px;padding:36px;text-align:center;margin-bottom:20px;transition:all .2s;cursor:pointer}
+.dropzone:hover{border-color:var(--cyan);background:rgba(79,124,255,0.03)}
+.dropzone-ico{font-size:28px;margin-bottom:10px}
+.dropzone-text{font-size:14px;color:var(--text-dim)}
+.dropzone-sub{font-family:'Space Mono',monospace;font-size:10px;color:var(--grey);margin-top:6px}
+
+/* FIELDS */
+.field{margin-bottom:20px}
+.field-label{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;display:block}
+.field input,.field textarea{width:100%;background:var(--panel-2);border:1px solid var(--border-soft);border-radius:8px;padding:12px 14px;color:var(--white);font-family:'Space Mono',monospace;font-size:13px;transition:border-color .2s}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px var(--cyan-dim)}
+.field textarea{resize:vertical;min-height:90px;line-height:1.5}
+
+.toast{position:fixed;bottom:28px;right:28px;z-index:1000;background:var(--panel);border:1px solid rgba(61,214,140,0.3);border-left:3px solid var(--green);
+  border-radius:8px;padding:14px 20px;font-size:13px;display:flex;align-items:center;gap:10px;transform:translateX(400px);transition:transform .3s cubic-bezier(.2,.8,.2,1);box-shadow:0 12px 40px rgba(0,0,0,0.5)}
+.toast.show{transform:none}
+.section-gap{margin-top:20px}
+.menu-toggle{display:none;background:none;border:none;color:var(--white);cursor:pointer;font-size:22px}
+
+@media(max-width:1024px){.grid-2,.grid-4{grid-template-columns:1fr 1fr}.tpl-grid{grid-template-columns:1fr 1fr}.session-body{grid-template-columns:1fr;gap:24px}.gauge{margin:0 auto}}
+@media(max-width:768px){
+  .sidebar{position:fixed;left:-260px;z-index:100;transition:left .3s;box-shadow:0 0 40px rgba(0,0,0,.6)}
+  .sidebar.open{left:0}.menu-toggle{display:block}
+  .grid-2,.grid-4,.tpl-grid,.tiers{grid-template-columns:1fr}.slots-grid{grid-template-columns:repeat(3,1fr)}
+  .content{padding:20px}.topbar{padding:0 18px}.metrics{grid-template-columns:1fr 1fr}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ════════ ADD-ONS — Thème B ════════ */
+.icon-btn{width:38px;height:38px;border-radius:9px;background:var(--panel);border:1px solid var(--border-soft);color:var(--text-dim);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;position:relative;flex-shrink:0}
+.icon-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.icon-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7}
+.notif-badge{position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--red);color:#fff;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--void)}
+.notif-badge.hidden{display:none}
+.credit-pill{display:flex;align-items:center;gap:9px;padding:7px 14px;border-radius:20px;background:var(--panel);border:1px solid var(--border-soft);cursor:pointer;transition:all .18s}
+.credit-pill:hover{border-color:var(--cyan)}
+.credit-pill .cp-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim)}
+.credit-pill .cp-val{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;color:var(--cyan)}
+.notif-wrap{position:relative}
+.notif-pop{position:absolute;top:50px;right:0;width:348px;background:var(--panel);border:1px solid var(--border);border-radius:13px;box-shadow:0 22px 60px rgba(0,0,0,.55);z-index:300;overflow:hidden;display:none}
+.notif-pop.open{display:block}
+.notif-pop-head{display:flex;align-items:center;justify-content:space-between;padding:15px 17px;border-bottom:1px solid var(--border-soft)}
+.notif-pop-head .t{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px}
+.notif-pop-head a{font-size:11px;color:var(--cyan);cursor:pointer}
+.notif-list{max-height:380px;overflow-y:auto}
+.notif-item{display:flex;gap:12px;padding:14px 17px;border-bottom:1px solid var(--border-soft)}
+.notif-item:last-child{border:none}
+.notif-item.unread{background:var(--cyan-dim)}
+.ni-ico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+.ni-body{flex:1;min-width:0}
+.ni-body .nt{font-size:13px;line-height:1.45}
+.ni-body .ntime{font-family:'Space Mono',monospace;font-size:10px;color:var(--grey);margin-top:3px}
+.notif-empty{padding:28px 17px;text-align:center;font-family:'Space Mono',monospace;font-size:12px;color:var(--text-dim)}
+/* favorites */
+.fav-row{display:flex;gap:12px;flex-wrap:wrap}
+.fav-chip{display:flex;align-items:center;gap:14px;padding:13px 15px;border-radius:11px;background:var(--panel-2);border:1px solid var(--border-soft);min-width:250px;transition:all .18s}
+.fav-chip:hover{border-color:var(--cyan)}
+.fav-chip .fc-main{flex:1;min-width:0}
+.fav-chip .fc-name{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px}
+.fav-chip .fc-sub{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);margin-top:3px}
+.fav-x{background:none;border:none;color:var(--grey);cursor:pointer;font-size:15px;padding:2px 4px;transition:color .15s}
+.fav-x:hover{color:var(--red)}
+.fav-empty{font-family:'Space Mono',monospace;font-size:12px;color:var(--text-dim);padding:6px 2px}
+/* segmented (auto-recharge etc) */
+.seg{display:inline-flex;border:1px solid var(--border-soft);border-radius:8px;overflow:hidden;background:var(--panel-2)}
+.seg button{padding:8px 16px;background:none;border:none;color:var(--text-dim);font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}
+.seg button.on{background:var(--cyan);color:#fff}
+.amount-row{display:flex;gap:10px;flex-wrap:wrap}
+.amount-btn{padding:14px 20px;border-radius:10px;background:var(--panel-2);border:1px solid var(--border-soft);color:var(--white);font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px;cursor:pointer;transition:all .18s}
+.amount-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.tx-row{display:flex;align-items:center;justify-content:space-between;padding:13px 2px;border-bottom:1px solid var(--border-soft);font-size:13px}
+.tx-row:last-child{border:none}
+.tx-amt.pos{color:var(--green)}
+.tx-amt.neg{color:var(--text-dim)}
+/* help fab */
+.help-fab{position:fixed;bottom:28px;left:28px;z-index:900;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--violet));border:none;color:#fff;cursor:pointer;box-shadow:0 12px 32px rgba(79,124,255,.32);display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.help-fab:hover{transform:translateY(-3px)}
+.help-fab svg{width:23px;height:23px;stroke:#fff;fill:none;stroke-width:1.8}
+.help-panel{position:fixed;bottom:92px;left:28px;z-index:900;width:368px;max-height:74vh;background:var(--panel);border:1px solid var(--border);border-radius:15px;box-shadow:0 28px 70px rgba(0,0,0,.6);display:none;flex-direction:column;overflow:hidden}
+.help-panel.open{display:flex}
+.help-head{padding:18px 20px;border-bottom:1px solid var(--border-soft);display:flex;align-items:flex-start;justify-content:space-between}
+.help-head .ht{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px}
+.help-head .hs{font-size:12px;color:var(--text-dim);margin-top:4px}
+.help-close{background:none;border:none;color:var(--text-dim);font-size:17px;cursor:pointer}
+.help-body{padding:8px 12px;overflow-y:auto;flex:1}
+.faq{border-bottom:1px solid var(--border-soft)}
+.faq:last-child{border:none}
+.faq-q{padding:13px 8px;font-size:13px;font-weight:500;cursor:pointer;display:flex;justify-content:space-between;gap:10px}
+.faq-q span{color:var(--cyan);transition:transform .2s}
+.faq.open .faq-q span{transform:rotate(45deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .25s;font-size:12px;color:var(--text-dim);line-height:1.6}
+.faq.open .faq-a{max-height:200px;padding:0 8px 13px}
+.help-foot{padding:14px;border-top:1px solid var(--border-soft);display:flex;gap:8px}
+.help-foot input{flex:1;background:var(--panel-2);border:1px solid var(--border-soft);border-radius:8px;padding:10px 12px;color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:13px}
+.help-foot input:focus{outline:none;border-color:var(--cyan)}
+
+/* ════════ THÈME CLAIR ════════ */
+html[data-theme="light"]{
+  --void:#F4F6FB;--deep:#EAEEF6;--panel:#FFFFFF;--panel-2:#F2F5FB;
+  --border:#E2E7F1;--border-soft:rgba(40,60,110,0.10);
+  --cyan:#2F66E0;--cyan-dim:rgba(47,102,224,0.10);--cyan-glow:rgba(47,102,224,0.18);
+  --violet:#5A52E0;--violet-dim:rgba(90,82,224,0.12);
+  --green:#1F9D63;--amber:#C07A10;--red:#D6455F;
+  --white:#19202E;--grey:#8089A0;--text-dim:#5A6478;
+}
+html[data-theme="light"] body{background:var(--void);color:var(--white)}
+html[data-theme="light"] body::before{background:radial-gradient(600px circle at 12% 8%,rgba(47,102,224,0.06),transparent 50%),radial-gradient(700px circle at 88% 92%,rgba(90,82,224,0.05),transparent 50%)}
+html[data-theme="light"] .topbar{background:rgba(255,255,255,0.78)}
+html[data-theme="light"] .sidebar{background:rgba(255,255,255,0.72)}
+html[data-theme="light"] .metric,html[data-theme="light"] .conn-box,html[data-theme="light"] .extend-panel{background:#F2F5FB}
+html[data-theme="light"] .session-card,html[data-theme="light"] .checkout-bar{background:linear-gradient(150deg,#FFFFFF,#F1F5FC)}
+html[data-theme="light"] .table td,html[data-theme="light"] .feed-row{border-bottom-color:rgba(40,60,110,0.10)}
+html[data-theme="light"] .table tr:hover td{background:rgba(47,102,224,0.04)}
+html[data-theme="light"] .notif-pop,html[data-theme="light"] .help-panel{box-shadow:0 22px 50px rgba(40,60,110,.18)}
+html[data-theme="light"] .toast{box-shadow:0 12px 40px rgba(40,60,110,.2)}
+html[data-theme="light"] .notif-badge{border-color:#fff}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-logo">Station<em>Flex</em></div></div>
+    <div class="nav-group-label">Pilotage</div>
+    <button class="nav-item active" data-view="overview">
+      <span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span>Vue d'ensemble</button>
+    <button class="nav-item" data-view="reserve">
+      <span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>Réserver
+      <span class="nav-badge" id="navFreeBadge">…</span></button>
+    <button class="nav-item" data-view="render">
+      <span class="ico"><svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></span>Rendu 3D</button>
+    <button class="nav-item" data-view="sessions">
+      <span class="ico"><svg viewBox="0 0 24 24"><polyline points="12 6 12 12 16 14"/><circle cx="12" cy="12" r="9"/></svg></span>Mes sessions</button>
+    <div class="nav-group-label">Données</div>
+    <button class="nav-item" data-view="files">
+      <span class="ico"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span>Fichiers</button>
+    <button class="nav-item" data-view="usage">
+      <span class="ico"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l3-4 3 2 4-6"/></svg></span>Consommation</button>
+    <button class="nav-item" data-view="invoices">
+      <span class="ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg></span>Factures</button>
+    <div class="nav-group-label">Compte</div>
+    <button class="nav-item" data-view="credits">
+      <span class="ico"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span>Crédits</button>
+    <button class="nav-item" data-view="profile">
+      <span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg></span>Profil & clé SSH</button>
+    <div class="sidebar-foot">
+      <div class="user-chip">
+        <div class="avatar" id="userAvatar">··</div>
+        <div class="user-meta"><div class="user-name" id="userName">…</div><div class="user-email" id="userEmail">…</div></div>
+        <button class="step-btn" title="Déconnexion" onclick="logout()" style="margin-left:auto;width:30px;height:30px">⏻</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:14px">
+        <button class="menu-toggle" id="menuToggle">☰</button>
+        <span class="page-title" id="pageTitle">Vue d'ensemble</span>
+      </div>
+      <div class="topbar-right">
+        <div class="status-pill"><span class="dot dot-green"></span>node2 · online</div>
+        <div class="credit-pill" onclick="goView('credits')" title="Crédits prépayés"><span class="cp-label">Crédits</span><span class="cp-val" id="creditPill">—</span></div>
+        <div class="notif-wrap">
+          <button class="icon-btn" id="notifBtn" title="Notifications"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="notif-badge" id="notifBadge">0</span></button>
+          <div class="notif-pop" id="notifPop">
+            <div class="notif-pop-head"><span class="t">Notifications</span><a id="notifReadAll">Tout marquer lu</a></div>
+            <div class="notif-list" id="notifList"></div>
+          </div>
+        </div>
+        <button class="icon-btn" id="themeBtn" title="Thème clair / sombre"><svg id="themeIcon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+        <button class="btn btn-primary btn-sm" onclick="goView('reserve')">+ Réserver</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ════════ VUE D'ENSEMBLE ════════ -->
+      <div class="view active" id="view-overview">
+        <div class="grid grid-4" style="margin-bottom:20px">
+          <div class="stat"><div class="stat-label">Session</div><div class="stat-val" id="statSessionVal" style="color:var(--grey)">—</div><div class="stat-sub" id="statSessionSub">Aucune session active</div></div>
+          <div class="stat"><div class="stat-label">Temps restant</div><div class="stat-val" id="stat-remaining">—</div><div class="stat-sub" id="stat-endlabel">—</div></div>
+          <div class="stat"><div class="stat-label">Heures ce mois</div><div class="stat-val"><span id="statHours">0</span><small style="font-size:14px;color:var(--text-dim)">h</small></div><div class="stat-sub" id="statHoursSub">réservations confirmées</div></div>
+          <div class="stat"><div class="stat-label">Dépensé ce mois</div><div class="stat-val"><span id="statSpent">0</span><small style="font-size:14px;color:var(--text-dim)">€</small></div><div class="stat-sub" id="statSpentSub">0 facture</div></div>
+        </div>
+
+        <div class="card" id="overviewEmpty" style="display:none;text-align:center;padding:48px">
+          <div style="font-size:32px;margin-bottom:12px">🛰️</div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:18px;margin-bottom:8px">Aucune session active</div>
+          <div style="color:var(--text-dim);font-size:13px;margin-bottom:20px">Réserve un créneau GPU pour démarrer une session.</div>
+          <button class="btn btn-primary btn-sm" onclick="goView('reserve')">+ Réserver un créneau</button>
+        </div>
+
+        <div class="session-card" id="sessionCard">
+          <div class="session-top">
+            <div><div class="session-tag" id="sessTag">// session — node2</div><div class="session-name" id="sessName">Session GPU</div></div>
+            <span class="badge badge-active"><span class="dot dot-green"></span>En cours</span>
+          </div>
+          <div class="session-body">
+            <div class="gauge">
+              <svg width="180" height="180" viewBox="0 0 180 180">
+                <defs><linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4F7CFF"/><stop offset="100%" stop-color="#6366F1"/></linearGradient></defs>
+                <circle class="gauge-track" cx="90" cy="90" r="78"/>
+                <circle class="gauge-fill" id="gaugeFill" cx="90" cy="90" r="78" stroke-dasharray="490" stroke-dashoffset="74"/>
+              </svg>
+              <div class="gauge-center"><div class="gauge-val" id="gaugeVal">85%</div><div class="gauge-label">GPU Load</div></div>
+            </div>
+            <div style="flex:1;width:100%">
+              <div class="metrics">
+                <div class="metric"><div class="metric-label">VRAM · 64 Go total</div><div class="metric-val" id="m-vram">52.4 <small>Go</small></div><div class="metric-bar"><div class="metric-fill" id="m-vram-bar" style="width:82%"></div></div></div>
+                <div class="metric"><div class="metric-label">Température</div><div class="metric-val" id="m-temp">71 <small>°C</small></div><div class="metric-bar"><div class="metric-fill" id="m-temp-bar" style="width:71%"></div></div></div>
+                <div class="metric"><div class="metric-label">Puissance</div><div class="metric-val" id="m-power">612 <small>W</small></div><div class="metric-bar"><div class="metric-fill" id="m-power-bar" style="width:68%"></div></div></div>
+                <div class="metric"><div class="metric-label">RAM système</div><div class="metric-val" id="m-ram">96 <small>/ 128 Go</small></div><div class="metric-bar"><div class="metric-fill" id="m-ram-bar" style="width:75%"></div></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="countdown">
+            <div><div class="countdown-time" id="bigCountdown">01:23:40</div><div class="countdown-label" id="countdown-end">avant fin de session — sauvegarde auto vers le NAS</div></div>
+            <button class="btn btn-ghost btn-sm" onclick="toggleExtend()">+ Ajouter des heures</button>
+          </div>
+
+          <!-- Panneau d'extension de session -->
+          <div class="extend-panel" id="extendPanel">
+            <div class="extend-info">
+              Prolonger la session — <strong>Pro · 7€/h</strong>
+              <div class="extend-free" id="extendFree">✓ 2h disponibles après ton créneau</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:16px">
+              <div class="stepper">
+                <button class="step-btn" onclick="changeExt(-1)">−</button>
+                <span class="dur-val" id="extVal">1h</span>
+                <button class="step-btn" onclick="changeExt(1)">+</button>
+              </div>
+              <div style="text-align:right">
+                <div class="checkout-total" id="extCost" style="font-size:20px">7€</div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="confirmExtend()">Confirmer</button>
+            </div>
+          </div>
+
+          <div class="conn-row">
+            <div class="conn-box"><div class="conn-info"><div class="conn-label">Accès SSH</div><div class="conn-cmd" id="sshCmd">—</div></div><button class="btn btn-sm" onclick="copySsh()">Copier</button></div>
+            <div class="conn-box"><div class="conn-info"><div class="conn-label">Bureau / service web (navigateur)</div><div class="conn-cmd">noVNC · token sécurisé</div></div><button class="btn btn-primary btn-sm" id="openVncBtn" onclick="openActiveVNC()">Ouvrir</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ RÉSERVER ════════ -->
+      <div class="view" id="view-reserve">
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-head"><div class="card-title">// favoris — re-réserver en 1 clic</div><div class="mono" id="favCount"></div></div>
+          <div class="fav-row" id="favRow"></div>
+        </div>
+        <!-- Étape 1 : date + créneau + durée -->
+        <div class="grid grid-2" style="margin-bottom:20px">
+          <div class="card">
+            <div class="cal-head">
+              <div class="cal-month" id="calMonth">Juin 2026</div>
+              <div class="cal-nav"><button onclick="changeMonth(-1)">‹</button><button onclick="changeMonth(1)">›</button></div>
+            </div>
+            <div class="cal-grid" id="calGrid"></div>
+            <div style="display:flex;gap:18px;margin-top:16px;font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim)">
+              <span style="display:flex;align-items:center;gap:6px"><span class="dot dot-green"></span>Disponible</span>
+              <span style="display:flex;align-items:center;gap:6px"><span class="dot" style="background:var(--red)"></span>Complet</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">// heure de début — <span id="slotDate">19 juin</span></div></div>
+            <div class="slots-grid" id="slotsGrid"></div>
+            <div class="duration-row">
+              <span class="dur-label">Durée</span>
+              <div class="stepper">
+                <button class="step-btn" id="durMinus" onclick="changeDur(-1)">−</button>
+                <span class="dur-val" id="durVal">1h</span>
+                <button class="step-btn" id="durPlus" onclick="changeDur(1)">+</button>
+              </div>
+              <span class="dur-max" id="durMax">sélectionne une heure de début</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Étape 2 : environnement (template) -->
+        <div class="card section-gap">
+          <div class="card-head">
+            <div class="card-title">// environnement — outils & modèles déjà prêts</div>
+            <div class="mono">cache partagé · chargement instantané</div>
+          </div>
+          <div class="tpl-grid" id="templatesBox"></div>
+        </div>
+
+        <!-- Étape 3 : puissance + paiement -->
+        <div class="card section-gap">
+          <div class="card-head"><div class="card-title">// puissance</div></div>
+          <div class="tiers" id="tiersBox">
+            <div class="tier" data-tier="starter" data-price="4" onclick="pickTier(this)">
+              <div class="tier-name">Starter</div><div class="tier-price">4€ <small>/h</small></div>
+              <div class="tier-specs">1× RTX 5090 · 32 Go RAM<br>8 cœurs · 200 Go stockage</div>
+            </div>
+            <div class="tier picked" data-tier="pro" data-price="7" onclick="pickTier(this)">
+              <div class="tier-name">Pro</div><div class="tier-price">7€ <small>/h</small></div>
+              <div class="tier-specs">2× RTX 5090 · 128 Go ECC<br>32 cœurs · 1 To stockage</div>
+            </div>
+          </div>
+          <div class="checkout-bar">
+            <div class="checkout-summary">
+              <span id="checkoutDesc">Pro · IA & LLM · 1h</span><br>
+              <strong id="checkoutMeta">19 juin · sélectionne une heure de début</strong>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="saveFavorite()" title="Enregistrer cette configuration">☆ Favori</button>
+            <div style="text-align:right">
+              <div class="checkout-total" id="checkoutTotal">7€</div>
+              <button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="checkout()">Payer →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ RENDU 3D ════════ -->
+      <div class="view" id="view-render">
+        <div class="grid grid-2">
+          <!-- Soumission -->
+          <div class="card">
+            <div class="card-head"><div class="card-title">// nouveau rendu — dépose, on calcule, tu récupères la vidéo</div></div>
+            <div class="dropzone" onclick="toast('Sélecteur de fichier .blend')" style="padding:24px;margin-bottom:18px">
+              <div class="dropzone-ico">🎬</div>
+              <div class="dropzone-text" id="rjBlend">scene_finale.blend</div>
+              <div class="dropzone-sub">Clique pour changer de fichier · uploadé sur le NAS</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <div class="field"><label class="field-label">Frame début</label><input type="number" id="rjStart" value="1" oninput="updateEstimate()"></div>
+              <div class="field"><label class="field-label">Frame fin</label><input type="number" id="rjEnd" value="250" oninput="updateEstimate()"></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <div class="field"><label class="field-label">FPS (vidéo)</label><input type="number" id="rjFps" value="24"></div>
+              <div class="field"><label class="field-label">Budget max (€)</label><input type="number" id="rjCap" value="20"></div>
+            </div>
+            <div class="checkout-bar">
+              <div class="checkout-summary">
+                <span id="rjCount">250 frames</span> · 2× RTX 5090 OptiX<br>
+                <strong id="rjEst">≈ 12–18 € estimés</strong>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="submitRender()">Lancer le rendu →</button>
+            </div>
+            <p style="font-size:11px;color:var(--text-dim);margin-top:14px;line-height:1.6">
+              Empreinte bancaire au plafond, débit du <strong style="color:var(--white)">temps GPU réel</strong> uniquement. Le rendu tourne dès qu'un GPU se libère.
+            </p>
+          </div>
+
+          <!-- Suivi -->
+          <div class="card">
+            <div class="card-head"><div class="card-title">// mes rendus</div></div>
+            <div id="renderList"><div class="file-sub" style="padding:14px">Chargement…</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ SESSIONS ════════ -->
+      <div class="view" id="view-sessions">
+        <div class="card">
+          <div class="card-head"><div class="card-title">// historique des sessions</div></div>
+          <table class="table">
+            <thead><tr><th>Réservation</th><th>Environnement</th><th>Tier</th><th>Période</th><th>Durée</th><th>Montant</th><th>Statut</th></tr></thead>
+            <tbody id="sessionsBody"><tr><td colspan="7" class="mono" style="padding:18px">Chargement…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ════════ FICHIERS ════════ -->
+      <div class="view" id="view-files">
+        <div class="card" style="border-color:rgba(245,181,68,0.3);background:rgba(245,181,68,0.04);margin-bottom:20px">
+          <div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--amber)">⚠ Aperçu — le gestionnaire de fichiers (NAS) n'est pas encore connecté au backend. Données illustratives.</div>
+        </div>
+        <div class="dropzone" onclick="toast('Module fichiers à venir')">
+          <div class="dropzone-ico">⤓</div>
+          <div class="dropzone-text">Glisse tes fichiers ici ou clique pour parcourir</div>
+          <div class="dropzone-sub">Espace session : 1 To · transfert via 10 Gbps SFP+</div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">// workspace session #4821</div><div class="mono">412 Go / 1 To utilisés</div></div>
+          <div class="file-row"><div class="file-ico">🧠</div><div class="file-meta"><div class="file-name">llama-70b-finetuned.safetensors</div><div class="file-sub">138 Go · modifié il y a 12 min</div></div><a class="link" onclick="toast('Téléchargement…')">Télécharger</a></div>
+          <div class="file-row"><div class="file-ico">📦</div><div class="file-meta"><div class="file-name">dataset_train.tar.gz</div><div class="file-sub">64 Go · modifié il y a 3 h</div></div><a class="link" onclick="toast('Téléchargement…')">Télécharger</a></div>
+          <div class="file-row"><div class="file-ico">📄</div><div class="file-meta"><div class="file-name">training_logs.txt</div><div class="file-sub">2.4 Mo · modifié il y a 1 min</div></div><a class="link" onclick="toast('Téléchargement…')">Télécharger</a></div>
+          <div class="card-title" style="margin-top:28px;margin-bottom:14px">// modèles partagés disponibles (lecture seule)</div>
+          <div class="file-row"><div class="file-ico">📚</div><div class="file-meta"><div class="file-name">Llama 3.3 70B · Mistral 7B · Qwen2.5 32B</div><div class="file-sub">Cache partagé · montés automatiquement dans la session</div></div><span class="retention" style="color:var(--green)">✓ prêts</span></div>
+          <div class="card-title" style="margin-top:28px;margin-bottom:14px">// zone de rétention (post-session)</div>
+          <div class="file-row"><div class="file-ico">🗄️</div><div class="file-meta"><div class="file-name">session-4790-outputs/</div><div class="file-sub">Session du 17 juin · 89 Go</div></div><span class="retention">⏳ purge dans 41h</span></div>
+        </div>
+      </div>
+
+      <!-- ════════ FACTURES ════════ -->
+      <div class="view" id="view-invoices">
+        <div class="card">
+          <div class="card-head"><div class="card-title">// factures stripe</div></div>
+          <table class="table">
+            <thead><tr><th>Réservation</th><th>Période</th><th>Environnement</th><th>Montant</th><th>Statut</th><th></th></tr></thead>
+            <tbody id="invoicesBody"><tr><td colspan="6" class="mono" style="padding:18px">Chargement…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ════════ PROFIL ════════ -->
+      <div class="view" id="view-profile">
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-head"><div class="card-title">// identité</div></div>
+            <div class="field"><label class="field-label">Email (identifiant)</label><input type="email" id="profEmail" value="" readonly></div>
+            <div class="field"><label class="field-label">Compte créé le</label><input type="text" id="profCreated" value="—" readonly></div>
+            <div class="field"><label class="field-label">Rôle</label><input type="text" id="profRole" value="—" readonly></div>
+            <p style="font-size:11px;color:var(--text-dim)">L'email sert d'identifiant de connexion et de destinataire des factures Stripe.</p>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">// clé publique SSH</div></div>
+            <p style="font-size:13px;color:var(--text-dim);margin-bottom:14px;line-height:1.6">Cette clé est injectée dans ton conteneur de session pour l'accès SSH. Aucune clé = impossible de réserver.</p>
+            <div class="field"><label class="field-label">Clé publique (~/.ssh/id_ed25519.pub)</label><textarea id="profSsh" placeholder="ssh-ed25519 AAAA…"></textarea></div>
+            <button class="btn btn-primary btn-sm" onclick="saveSSH()">Mettre à jour la clé</button>
+            <div id="sshStatus" style="margin-top:20px;padding:14px;border-radius:8px;display:none"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ CONSOMMATION ════════ -->
+      <div class="view" id="view-usage">
+        <div class="grid grid-4" style="margin-bottom:20px">
+          <div class="stat"><div class="stat-label">Heures ce mois</div><div class="stat-val">84<small style="font-size:14px;color:var(--text-dim)">h</small></div><div class="stat-sub"><strong>+22%</strong> vs mai</div></div>
+          <div class="stat"><div class="stat-label">Dépensé ce mois</div><div class="stat-val">588<small style="font-size:14px;color:var(--text-dim)">€</small></div><div class="stat-sub">12 sessions</div></div>
+          <div class="stat"><div class="stat-label">Coût moyen / session</div><div class="stat-val">49<small style="font-size:14px;color:var(--text-dim)">€</small></div><div class="stat-sub">≈ 7h en moyenne</div></div>
+          <div class="stat"><div class="stat-label">Tier le plus utilisé</div><div class="stat-val" style="font-size:20px">Pro</div><div class="stat-sub">72% des heures</div></div>
+        </div>
+        <div class="grid grid-2">
+          <div class="card"><div class="card-head"><div class="card-title">// heures par mois</div></div><div id="usageHours"></div></div>
+          <div class="card"><div class="card-head"><div class="card-title">// dépenses par mois</div></div><div id="usageSpend"></div></div>
+        </div>
+        <div class="card section-gap"><div class="card-head"><div class="card-title">// répartition par environnement</div></div><div id="usageByEnv"></div></div>
+      </div>
+
+      <!-- ════════ CRÉDITS ════════ -->
+      <div class="view" id="view-credits">
+        <div class="grid grid-2" style="margin-bottom:20px">
+          <div class="session-card">
+            <div class="session-top"><div><div class="session-tag">// solde prépayé</div><div class="session-name" id="creditBig">—</div></div><span class="badge badge-paid">Crédits</span></div>
+            <p style="font-size:13px;color:var(--text-dim);margin:6px 0 20px;line-height:1.6">Recharge ton compte et paie tes sessions sans ressaisir ta carte. Les crédits ne périment pas.</p>
+            <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);margin-bottom:11px">Recharger</div>
+            <div class="amount-row">
+              <button class="amount-btn" onclick="recharge(20)">+20€</button>
+              <button class="amount-btn" onclick="recharge(50)">+50€</button>
+              <button class="amount-btn" onclick="recharge(100)">+100€</button>
+              <button class="amount-btn" onclick="recharge(200)">+200€</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">// recharge automatique</div></div>
+            <p style="font-size:13px;color:var(--text-dim);margin-bottom:16px;line-height:1.6">Recharge automatiquement quand ton solde passe sous un seuil — zéro coupure en pleine session.</p>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+              <span style="font-size:13px;font-weight:500">Activer la recharge auto</span>
+              <div class="seg" id="autoSeg"><button data-v="off" class="on" onclick="setAuto(false)">Off</button><button data-v="on" onclick="setAuto(true)">On</button></div>
+            </div>
+            <div id="autoCfg" style="opacity:.4;pointer-events:none">
+              <div class="field"><label class="field-label">Quand le solde &lt; (€)</label><input type="number" id="autoThresh" value="10"></div>
+              <div class="field"><label class="field-label">Recharger de (€)</label><input type="number" id="autoAmount" value="50"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card"><div class="card-head"><div class="card-title">// historique des transactions</div></div><div id="txList"></div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span style="color:var(--green)">✓</span><span id="toastMsg">OK</span></div>
+
+<button class="help-fab" id="helpFab" title="Aide & support"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.5-3 4"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></button>
+<div class="help-panel" id="helpPanel">
+  <div class="help-head"><div><div class="ht">Aide & support</div><div class="hs">Réponse en moins de 2h · 09h–19h</div></div><button class="help-close" id="helpClose">✕</button></div>
+  <div class="help-body" id="helpBody">
+    <div class="faq"><div class="faq-q">Comment me connecter à ma session ?<span>+</span></div><div class="faq-a">Dès le début de ton créneau, une commande SSH et un lien navigateur (noVNC) apparaissent sur la Vue d'ensemble. Ta clé SSH publique doit être renseignée dans Profil.</div></div>
+    <div class="faq"><div class="faq-q">Que deviennent mes fichiers après la session ?<span>+</span></div><div class="faq-a">Tes outputs sont archivés sur le NAS et conservés 48h (Starter) ou 72h (Pro). Tu peux les télécharger depuis l'onglet Fichiers avant la purge.</div></div>
+    <div class="faq"><div class="faq-q">Comment fonctionnent les crédits ?<span>+</span></div><div class="faq-a">Recharge ton solde dans l'onglet Crédits ; chaque session est débitée automatiquement. Active la recharge auto pour ne jamais être interrompu.</div></div>
+    <div class="faq"><div class="faq-q">Puis-je prolonger une session en cours ?<span>+</span></div><div class="faq-a">Oui, depuis la Vue d'ensemble via « Ajouter des heures », si le créneau suivant est libre.</div></div>
+  </div>
+  <div class="help-foot"><input id="helpInput" placeholder="Pose ta question…"><button class="btn btn-primary btn-sm" id="helpSend">Envoyer</button></div>
+</div>
+
+<script>
+/* ═══════════ StationFlex Dashboard — intégration API ═══════════ */
+const API='/api/v1';
+const $=id=>document.getElementById(id);
+const token=()=>localStorage.getItem('sf_token');
+if(!token())location.href='/';
+const authH=()=>({'Authorization':'Bearer '+token(),'Content-Type':'application/json'});
+async function api(path,opts={}){const r=await fetch(API+path,{headers:authH(),...opts});if(r.status===401){localStorage.removeItem('sf_token');location.href='/';throw new Error('401');}return r;}
+function logout(){localStorage.removeItem('sf_token');location.href='/';}
+const cap=s=>s?s.charAt(0).toUpperCase()+s.slice(1):s;
+const TPLNAMES={ml:'IA & LLM',genai:'IA générative',render:'Rendu 3D & VFX',science:'Calcul scientifique',dev:'Dev & DevOps',gamedev:'Game build'};
+const tplName=s=>TPLNAMES[s]||s;
+
+/* ═══ NAVIGATION ═══ */
+const titles={overview:"Vue d'ensemble",reserve:"Réserver un créneau",render:"Rendu 3D",sessions:"Mes sessions",files:"Fichiers",usage:"Consommation",invoices:"Factures",credits:"Crédits & recharge",profile:"Profil & clé SSH"};
+function goView(v){
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  $('view-'+v).classList.add('active');
+  document.querySelector('.nav-item[data-view="'+v+'"]').classList.add('active');
+  $('pageTitle').textContent=titles[v];
+  $('sidebar').classList.remove('open');
+  if(v==='sessions')loadSessions();
+  if(v==='invoices')loadInvoices();
+  if(v==='render')loadRenderJobs();
+  if(v==='overview')refreshOverview();
+}
+document.querySelectorAll('.nav-item').forEach(b=>b.addEventListener('click',()=>goView(b.dataset.view)));
+$('menuToggle').onclick=()=>$('sidebar').classList.toggle('open');
+
+/* ═══ TOAST ═══ */
+let toastTimer;
+function toast(msg){$('toastMsg').textContent=msg;const t=$('toast');t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2800);}
+
+/* ═══ ÉTAT ═══ */
+let TIERS={},ME=null,RESAS=[],ACTIVE=null,ACTIVE_SESSION=null;
+
+/* ═══ PROFIL / ME ═══ */
+async function loadMe(){
+  try{const r=await api('/auth/me');if(!r.ok)return;ME=await r.json();
+    $('userEmail').textContent=ME.email;
+    $('userName').textContent=ME.email.split('@')[0];
+    $('userAvatar').textContent=ME.email.slice(0,2).toUpperCase();
+    $('profEmail').value=ME.email;
+    $('profCreated').value=ME.created_at?new Date(ME.created_at).toLocaleDateString('fr-FR'):'—';
+    $('profRole').value=ME.is_admin?'Administrateur':'Client';
+    if(ME.ssh_public_key)$('profSsh').value=ME.ssh_public_key;
+  }catch(_){}
+}
+async function saveSSH(){
+  const key=$('profSsh').value.trim();const box=$('sshStatus');box.style.display='none';
+  try{const r=await api('/auth/me/ssh-key',{method:'PUT',body:JSON.stringify({ssh_public_key:key})});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok){box.style.display='block';box.style.background='rgba(247,115,137,0.05)';box.style.border='1px solid rgba(247,115,137,0.3)';box.innerHTML='<div style="font-family:Space Mono,monospace;font-size:11px;color:var(--red)">✗ '+(d.detail||'Clé invalide')+'</div>';return;}
+    if(ME)ME.ssh_public_key=key;
+    box.style.display='block';box.style.background='rgba(61,214,140,0.05)';box.style.border='1px solid rgba(61,214,140,0.2)';box.innerHTML='<div style="font-family:Space Mono,monospace;font-size:11px;color:var(--green)">✓ Clé SSH enregistrée</div>';
+    toast('Clé SSH enregistrée');
+  }catch(_){toast('Erreur réseau');}
+}
+
+/* ═══ TIERS (prix réels) ═══ */
+async function loadTiers(){
+  try{const r=await fetch(API+'/config/tiers');if(!r.ok)return;TIERS=await r.json();
+    document.querySelectorAll('.tier').forEach(el=>{const t=el.dataset.tier;if(TIERS[t]){const p=Math.round(TIERS[t].price_cents/100);el.dataset.price=p;const pe=el.querySelector('.tier-price');if(pe)pe.innerHTML=p+'€ <small>/h</small>';if(t===pickedTier)pickedPrice=p;}});
+    updateCheckout();
+  }catch(_){}
+}
+
+/* ═══ RÉSERVATIONS (chargement partagé) ═══ */
+async function loadReservations(){try{const r=await api('/reservations');if(r.ok)RESAS=await r.json();}catch(_){RESAS=[];}return RESAS;}
+
+/* ═══ VUE D'ENSEMBLE ═══ */
+async function refreshOverview(){
+  await loadReservations();
+  ACTIVE=RESAS.find(r=>r.status==='ACTIVE')||RESAS.find(r=>r.status==='PROVISIONING')||null;
+  const mo=new Date().getMonth(),yr=new Date().getFullYear();
+  let hours=0,spent=0,n=0;
+  RESAS.forEach(r=>{const st=new Date(r.start_at);if(['PAID','ACTIVE','ENDED','PROVISIONING'].includes(r.status)&&st.getMonth()===mo&&st.getFullYear()===yr){hours+=(new Date(r.end_at)-new Date(r.start_at))/3.6e6;spent+=r.amount_cents/100;n++;}});
+  $('statHours').textContent=Math.round(hours);
+  $('statSpent').textContent=Math.round(spent);
+  $('statSpentSub').textContent=n+' réservation'+(n>1?'s':'');
+  if(ACTIVE){
+    $('overviewEmpty').style.display='none';$('sessionCard').style.display='';
+    $('statSessionVal').textContent=ACTIVE.status==='ACTIVE'?'ACTIVE':'PROVISIONING';
+    $('statSessionVal').style.color=ACTIVE.status==='ACTIVE'?'var(--green)':'var(--amber)';
+    $('statSessionSub').innerHTML='Tier <strong style="color:var(--cyan)">'+cap(ACTIVE.tier)+'</strong> · '+tplName(ACTIVE.template);
+    $('sessTag').textContent='// '+ACTIVE.tier+' — node2 · '+tplName(ACTIVE.template);
+    $('sessName').textContent=tplName(ACTIVE.template);
+    startCountdownTo(new Date(ACTIVE.end_at));
+    await loadSessionConn(ACTIVE);
+    if(ACTIVE.status==='ACTIVE'&&ACTIVE_SESSION){if(!telAbort)startTelemetry(ACTIVE_SESSION.id);}else stopTelemetry();
+  }else{
+    $('overviewEmpty').style.display='';$('sessionCard').style.display='none';
+    $('statSessionVal').textContent='—';$('statSessionVal').style.color='var(--grey)';
+    $('statSessionSub').textContent='Aucune session active';
+    $('stat-remaining').textContent='—';$('stat-endlabel').textContent='—';
+    stopTelemetry();stopCountdown();
+  }
+}
+async function loadSessionConn(resa){
+  $('sshCmd').textContent='…';ACTIVE_SESSION=null;
+  try{const r=await api('/reservations/'+resa.id+'/session');
+    if(r.ok){const s=await r.json();ACTIVE_SESSION=s;$('sshCmd').textContent='ssh -p '+s.ssh_port+' sfuser@app.stationflex.host';}
+    else{$('sshCmd').textContent='session en préparation…';}
+  }catch(_){$('sshCmd').textContent='—';}
+}
+function openActiveVNC(){if(ACTIVE_SESSION&&ACTIVE_SESSION.vnc_token)window.open('/session/'+ACTIVE_SESSION.vnc_token+'/','_blank');else toast('Session pas encore prête');}
+function copySsh(){const cmd=$('sshCmd').textContent;navigator.clipboard&&navigator.clipboard.writeText(cmd).then(()=>toast('Commande SSH copiée'),()=>toast('Copie impossible'));}
+
+/* ═══ COMPTE À REBOURS ═══ */
+let cdTimer=null,remainingSec=null;
+function fmtDur(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),se=s%60;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(se).padStart(2,'0');}
+function startCountdownTo(end){
+  remainingSec=Math.max(0,Math.floor((end-Date.now())/1000));
+  $('stat-endlabel').textContent='Fin à '+end.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  if($('countdown-end'))$('countdown-end').textContent='avant fin de session — sauvegarde auto vers le NAS';
+  if(!cdTimer)cdTimer=setInterval(()=>{if(remainingSec===null)return;if(remainingSec>0)remainingSec--;const t=fmtDur(remainingSec);if($('bigCountdown'))$('bigCountdown').textContent=t;if($('stat-remaining'))$('stat-remaining').textContent=t;},1000);
+}
+function stopCountdown(){remainingSec=null;if($('bigCountdown'))$('bigCountdown').textContent='00:00:00';}
+
+/* ═══ TÉLÉMÉTRIE (SSE via fetch + Bearer) ═══ */
+let telAbort=null;const CIRC=2*Math.PI*78;
+function setGauge(pct){if($('gaugeFill'))$('gaugeFill').style.strokeDashoffset=CIRC*(1-pct/100);if($('gaugeVal'))$('gaugeVal').textContent=Math.round(pct)+'%';}
+function applyTelemetry(p){
+  if(p.ended){stopTelemetry();setTimeout(refreshOverview,2000);return;}
+  if(typeof p.remaining_seconds==='number')remainingSec=p.remaining_seconds;
+  const g=p.gpus||[];if(!g.length)return;
+  const load=g.reduce((a,x)=>a+(x.gpu_load_pct||0),0)/g.length;
+  const vram=g.reduce((a,x)=>a+(x.vram_used_go||0),0);
+  const vramTot=g.reduce((a,x)=>a+(x.vram_total_go||0),0)||64;
+  const temp=Math.round(Math.max.apply(null,g.map(x=>x.temp_c||0)));
+  const power=Math.round(g.reduce((a,x)=>a+(x.power_w||0),0));
+  setGauge(load);
+  $('m-vram').innerHTML=vram.toFixed(1)+' <small>Go</small>';$('m-vram-bar').style.width=(vram/vramTot*100)+'%';
+  $('m-temp').innerHTML=temp+' <small>°C</small>';$('m-temp-bar').style.width=Math.min(100,temp)+'%';
+  $('m-power').innerHTML=power+' <small>W</small>';$('m-power-bar').style.width=Math.min(100,power/1200*100)+'%';
+  $('m-ram').innerHTML=g.length+' <small>GPU actifs</small>';$('m-ram-bar').style.width='100%';
+}
+async function startTelemetry(sessionId){
+  stopTelemetry();telAbort=new AbortController();
+  try{
+    const r=await fetch(API+'/telemetry/'+sessionId,{headers:authH(),signal:telAbort.signal});
+    if(!r.ok||!r.body){telAbort=null;return;}
+    const reader=r.body.getReader(),dec=new TextDecoder();let buf='';
+    while(true){const out=await reader.read();if(out.done)break;buf+=dec.decode(out.value,{stream:true}).split(String.fromCharCode(13)).join('');
+      let i;while((i=buf.indexOf(String.fromCharCode(10)+String.fromCharCode(10)))>=0){const block=buf.slice(0,i);buf=buf.slice(i+2);const dl=block.split(String.fromCharCode(10)).find(l=>l.indexOf('data:')===0);if(dl){try{applyTelemetry(JSON.parse(dl.slice(5).trim()));}catch(_){}}}
+    }
+  }catch(_){}
+  telAbort=null;
+}
+function stopTelemetry(){if(telAbort){telAbort.abort();telAbort=null;}}
+
+/* ═══ RÉSERVER : calendrier + créneaux (GET /slots/availability) ═══ */
+const DOW=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+const MONTHS=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+const OPEN=8,CLOSE=23;
+let viewDate=new Date();viewDate.setDate(1);
+let selectedDate=new Date();selectedDate.setHours(0,0,0,0);
+let dayCache={},dayAvailability=[],pickedStart=null,pickedHours=1;
+function isoDay(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+async function fetchDay(d){const k=isoDay(d);if(dayCache[k])return dayCache[k];try{const r=await fetch(API+'/slots/availability?day='+k);const a=r.ok?await r.json():[];dayCache[k]=a;return a;}catch(_){return[];}}
+function renderCalendar(){
+  const y=viewDate.getFullYear(),mo=viewDate.getMonth();
+  $('calMonth').textContent=MONTHS[mo]+' '+y;
+  const grid=$('calGrid');grid.innerHTML='';
+  DOW.forEach(d=>{const e=document.createElement('div');e.className='cal-dow';e.textContent=d;grid.appendChild(e);});
+  let first=new Date(y,mo,1).getDay();first=(first===0?6:first-1);
+  const days=new Date(y,mo+1,0).getDate();const today=new Date();today.setHours(0,0,0,0);
+  for(let i=0;i<first;i++)grid.appendChild(document.createElement('div'));
+  for(let d=1;d<=days;d++){
+    const cell=document.createElement('div');cell.className='cal-day';
+    const cd=new Date(y,mo,d);
+    if(cd<today)cell.classList.add('disabled');
+    if(cd.getTime()===selectedDate.getTime())cell.classList.add('selected');
+    cell.innerHTML=d+'<span class="avail-dot"></span>';
+    if(cd>=today)cell.onclick=()=>{selectedDate=cd;pickedStart=null;pickedHours=1;renderCalendar();selectDay();};
+    grid.appendChild(cell);
+  }
+}
+function changeMonth(dir){viewDate.setMonth(viewDate.getMonth()+dir);renderCalendar();}
+async function selectDay(){
+  $('slotDate').textContent=selectedDate.getDate()+' '+MONTHS[selectedDate.getMonth()].toLowerCase();
+  dayAvailability=await fetchDay(selectedDate);
+  renderSlots();updateDuration();updateCheckout();
+}
+function slotTakenAt(h){const s=dayAvailability.find(x=>new Date(x.start).getHours()===h);return !s||!s.available;}
+function maxHoursFrom(start){if(start===null)return 1;let h=0;for(let t=start;t<CLOSE;t++){if(slotTakenAt(t))break;h++;}return Math.max(1,h);}
+function renderSlots(){
+  const g=$('slotsGrid');g.innerHTML='';
+  for(let h=OPEN;h<CLOSE;h++){
+    const s=document.createElement('div');s.className='slot';
+    const taken=slotTakenAt(h);if(taken)s.classList.add('taken');
+    if(pickedStart!==null&&h>=pickedStart&&h<pickedStart+pickedHours)s.classList.add(h===pickedStart?'picked':'in-span');
+    s.textContent=String(h).padStart(2,'0')+':00';
+    if(!taken)s.onclick=()=>{pickedStart=h;pickedHours=Math.min(pickedHours,maxHoursFrom(h));updateDuration();renderSlots();updateCheckout();};
+    g.appendChild(s);
+  }
+}
+function updateDuration(){const max=maxHoursFrom(pickedStart);$('durVal').textContent=pickedHours+'h';$('durMinus').disabled=(pickedStart===null||pickedHours<=1);$('durPlus').disabled=(pickedStart===null||pickedHours>=max);$('durMax').textContent=pickedStart===null?'sélectionne une heure de début':max+'h max consécutives dispo';}
+function changeDur(d){if(pickedStart===null){toast("Choisis d'abord une heure de début");return;}const max=maxHoursFrom(pickedStart);pickedHours=Math.max(1,Math.min(max,pickedHours+d));updateDuration();renderSlots();updateCheckout();}
+
+/* ═══ TEMPLATES ═══ */
+const TEMPLATES=[
+  {slug:'ml',name:'IA & LLM',tools:'PyTorch · JupyterLab · Transformers · vLLM',models:['Llama 3.3 70B','Mistral 7B','Qwen2.5 32B','bge-m3']},
+  {slug:'genai',name:'IA générative',tools:'ComfyUI · diffusers · xformers · ffmpeg',models:['FLUX.1-dev','SDXL','RealESRGAN']},
+  {slug:'render',name:'Rendu 3D & VFX',tools:'Blender · OptiX · ffmpeg · ImageMagick',models:[],note:"Environnement prêt à l'emploi",render:true},
+  {slug:'science',name:'Calcul scientifique',tools:'JAX · CuPy · R · Julia · JupyterLab',models:['bge-m3']},
+  {slug:'dev',name:'Dev & DevOps',tools:'VS Code · Node · Go · Rust · cmake',models:[],note:"Environnement prêt à l'emploi"},
+  {slug:'gamedev',name:'Game build',tools:'.NET · Vulkan · clang · code-server',models:[],note:'Licence moteur à fournir',warn:true},
+];
+let pickedTpl='ml';
+function renderTemplates(){
+  const box=$('templatesBox');box.innerHTML='';
+  TEMPLATES.forEach(t=>{
+    let body;
+    if(t.models.length)body='<div class="tpl-models-label">◆ Modèles déjà en cache</div><div class="tpl-models">'+t.models.map(m=>'<span class="model-chip">'+m+'</span>').join('')+'</div>';
+    else body='<div class="tpl-note '+(t.warn?'warn':'')+'">'+(t.warn?'⚠ ':'')+t.note+'</div>';
+    if(t.render)body+='<div class="tpl-badge-render">▸ Mode Render Job dispo</div>';
+    const el=document.createElement('div');el.className='tpl-card'+(t.slug===pickedTpl?' picked':'');el.dataset.tpl=t.slug;
+    el.innerHTML='<div class="tpl-head"><div class="tpl-name">'+t.name+'</div><div class="tpl-check">✓</div></div><div class="tpl-tools">'+t.tools+'</div>'+body;
+    el.onclick=()=>{pickedTpl=t.slug;renderTemplates();updateCheckout();};
+    box.appendChild(el);
+  });
+}
+
+/* ═══ TIER + CHECKOUT (POST /reservations → Stripe) ═══ */
+let pickedTier='pro',pickedPrice=7;
+function pickTier(el){document.querySelectorAll('.tier').forEach(t=>t.classList.remove('picked'));el.classList.add('picked');pickedTier=el.dataset.tier;pickedPrice=+el.dataset.price;updateCheckout();}
+function updateCheckout(){
+  const tpl=TEMPLATES.find(t=>t.slug===pickedTpl);const total=pickedPrice*pickedHours;
+  if($('checkoutDesc'))$('checkoutDesc').textContent=cap(pickedTier)+' · '+(tpl?tpl.name:'')+' · '+pickedHours+'h';
+  if($('checkoutTotal'))$('checkoutTotal').textContent=total+'€';
+  const moLabel=MONTHS[selectedDate.getMonth()].toLowerCase();
+  if($('checkoutMeta'))$('checkoutMeta').textContent=pickedStart!==null
+    ? selectedDate.getDate()+' '+moLabel+' · '+String(pickedStart).padStart(2,'0')+':00–'+String(pickedStart+pickedHours).padStart(2,'0')+':00'
+    : selectedDate.getDate()+' '+moLabel+' · sélectionne une heure de début';
+}
+async function checkout(){
+  if(pickedStart===null){toast("Sélectionne d'abord une heure de début");return;}
+  if(ME&&!ME.ssh_public_key){toast('Ajoute ta clé SSH dans Profil avant de réserver');goView('profile');return;}
+  const start=new Date(selectedDate);start.setHours(pickedStart,0,0,0);
+  const end=new Date(selectedDate);end.setHours(pickedStart+pickedHours,0,0,0);
+  try{const r=await api('/reservations',{method:'POST',body:JSON.stringify({tier:pickedTier,template:pickedTpl,start_at:start.toISOString(),end_at:end.toISOString()})});
+    const d=await r.json();if(!r.ok){toast(d.detail||'Erreur de réservation');return;}location.href=d.checkout_url;
+  }catch(_){toast('Erreur réseau');}
+}
+
+/* ═══ STATUTS ═══ */
+function badgeFor(status){
+  const s=(status||'').toUpperCase();
+  const map={ACTIVE:['badge-active','En cours'],PAID:['badge-paid','Payée · à venir'],PROVISIONING:['badge-paid','Provisioning'],PENDING_PAYMENT:['badge-ended','Paiement en attente'],ENDED:['badge-ended','Terminée'],CANCELLED:['badge-ended','Annulée'],FAILED:['badge-ended','Échec']};
+  const e=map[s]||['badge-ended',status];
+  return '<span class="badge '+e[0]+'">'+(e[0]==='badge-active'?'<span class="dot dot-green"></span>':'')+e[1]+'</span>';
+}
+
+/* ═══ MES SESSIONS (GET /reservations) ═══ */
+async function loadSessions(){
+  const tb=$('sessionsBody');tb.innerHTML='<tr><td colspan="7" class="mono" style="padding:18px">Chargement…</td></tr>';
+  await loadReservations();
+  if(!RESAS.length){tb.innerHTML='<tr><td colspan="7" class="mono" style="padding:18px">Aucune réservation</td></tr>';return;}
+  tb.innerHTML=RESAS.map(r=>{
+    const st=new Date(r.start_at),en=new Date(r.end_at);const dur=Math.round((en-st)/3.6e6);
+    const per=st.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'})+' · '+st.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'–'+en.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    return '<tr><td class="mono">'+r.id.slice(0,8)+'</td><td>'+tplName(r.template)+'</td><td>'+cap(r.tier)+'</td><td>'+per+'</td><td>'+dur+'h</td><td>'+(r.amount_cents/100).toFixed(2)+' €</td><td>'+badgeFor(r.status)+'</td></tr>';
+  }).join('');
+}
+
+/* ═══ FACTURES (dérivées des réservations) ═══ */
+async function loadInvoices(){
+  const tb=$('invoicesBody');tb.innerHTML='<tr><td colspan="6" class="mono" style="padding:18px">Chargement…</td></tr>';
+  await loadReservations();
+  const inv=RESAS.filter(r=>r.stripe_invoice_url||['PAID','ACTIVE','ENDED'].includes(r.status));
+  if(!inv.length){tb.innerHTML='<tr><td colspan="6" class="mono" style="padding:18px">Aucune facture</td></tr>';return;}
+  tb.innerHTML=inv.map(r=>{
+    const per=new Date(r.start_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'});
+    const link=r.stripe_invoice_url?'<a class="link" href="'+r.stripe_invoice_url+'" target="_blank">PDF ↗</a>':'<span class="mono">—</span>';
+    return '<tr><td class="mono">'+r.id.slice(0,8)+'</td><td>'+per+'</td><td>'+tplName(r.template)+'</td><td>'+(r.amount_cents/100).toFixed(2)+' €</td><td>'+badgeFor(r.status)+'</td><td>'+link+'</td></tr>';
+  }).join('');
+}
+
+/* ═══ RENDU 3D ═══ */
+function updateEstimate(){const a=+$('rjStart').value||0,b=+$('rjEnd').value||0;const f=Math.max(0,b-a+1);$('rjCount').textContent=f+' frames';$('rjEst').textContent='≈ '+Math.round(f*0.05)+'–'+Math.round(f*0.08)+' € estimés';}
+async function submitRender(){
+  const budget=+$('rjCap').value||0;if(budget<1){toast('Budget max invalide');return;}
+  const body={blend_path:($('rjBlend').textContent||'scene.blend').trim(),output_name:'render',frame_start:+$('rjStart').value||1,frame_end:+$('rjEnd').value||1,fps:+$('rjFps').value||24,gpu_count:2,budget_cap_cents:Math.round(budget*100)};
+  try{const r=await api('/render-jobs',{method:'POST',body:JSON.stringify(body)});const d=await r.json();
+    if(!r.ok){toast(d.detail||'Erreur de soumission');return;}
+    toast('Rendu créé · empreinte bancaire à confirmer');loadRenderJobs();
+  }catch(_){toast('Erreur réseau');}
+}
+const RJSTATUS={PENDING_PAYMENT:['badge-ended','Paiement requis'],QUEUED:['badge-paid','En file'],RENDERING:['badge-active','Rendu'],ENCODING:['badge-active','Encodage'],DONE:['badge-ended','Terminé'],FAILED:['badge-ended','Échec'],CANCELLED:['badge-ended','Annulé'],CAPPED:['badge-ended','Plafond atteint']};
+async function loadRenderJobs(){
+  const box=$('renderList');
+  try{const r=await api('/render-jobs');if(!r.ok){box.innerHTML='<div class="file-sub" style="padding:14px">Erreur de chargement</div>';return;}
+    const jobs=await r.json();
+    if(!jobs.length){box.innerHTML='<div class="file-sub" style="padding:14px">Aucun rendu pour le moment</div>';return;}
+    box.innerHTML=jobs.map(j=>{
+      const e=RJSTATUS[j.status]||['badge-ended',j.status];
+      const pct=j.total_frames?Math.round(j.frames_done/j.total_frames*100):0;
+      const cost=(j.cost_cents/100).toFixed(2).replace('.',',');
+      return '<div class="file-row"><div class="file-ico">🎬</div><div class="file-meta"><div class="file-name">'+j.output_name+' · frames '+j.frame_start+'–'+j.frame_end+'</div><div class="file-sub">'+j.frames_done+' / '+j.total_frames+' frames · '+cost+' €</div><div class="metric-bar" style="margin-top:8px"><div class="metric-fill" style="width:'+pct+'%"></div></div></div><span class="badge '+e[0]+'">'+(e[0]==='badge-active'?'<span class="dot dot-green"></span>':'')+e[1]+'</span></div>';
+    }).join('');
+  }catch(_){box.innerHTML='<div class="file-sub" style="padding:14px">Erreur réseau</div>';}
+}
+
+/* ═══ EXTENSION (pas d'endpoint backend) ═══ */
+function toggleExtend(){toast('Extension de session — bientôt disponible');}
+function changeExt(){}
+function confirmExtend(){}
+
+/* ═══ INIT ═══ */
+(async function init(){
+  await loadMe();
+  await loadTiers();
+  renderTemplates();
+  renderCalendar();
+  await selectDay();
+  const todayAvail=await fetchDay(new Date());
+  const free=todayAvail.filter(s=>s.available).length;
+  if($('navFreeBadge'))$('navFreeBadge').textContent=free+' libre'+(free>1?'s':'');
+  await refreshOverview();
+  updateEstimate();
+  if(location.search.indexOf('paid=1')>=0){toast('Paiement confirmé ✓');goView('sessions');history.replaceState({},'','/dashboard');}
+  else if(location.search.indexOf('canceled=1')>=0){toast('Paiement annulé');history.replaceState({},'','/dashboard');}
+  setInterval(()=>{if($('view-overview').classList.contains('active'))refreshOverview();},30000);
+})();
+</script>
+
+<script>
+/* ═══════════ ADD-ONS — thème, crédits, notifs, favoris, conso, aide ═══════════ */
+const LS=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v);}catch(_){return d;}};
+const LSset=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const gid=id=>document.getElementById(id);
+
+/* ── THÈME CLAIR / SOMBRE ── */
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme',t);
+  const ic=gid('themeIcon');
+  if(ic)ic.innerHTML=t==='light'
+    ?'<circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.2" y1="4.2" x2="5.6" y2="5.6"/><line x1="18.4" y1="18.4" x2="19.8" y2="19.8"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.2" y1="19.8" x2="5.6" y2="18.4"/><line x1="18.4" y1="5.6" x2="19.8" y2="4.2"/>'
+    :'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>';
+}
+let curTheme=LS('sf_theme','dark');applyTheme(curTheme);
+gid('themeBtn').onclick=()=>{curTheme=curTheme==='light'?'dark':'light';LSset('sf_theme',curTheme);applyTheme(curTheme);};
+
+/* ── CRÉDITS PRÉPAYÉS ── */
+let credits=LS('sf_credits',42),txs=LS('sf_txs',[{t:'Recharge',a:50,d:'12 juin'},{t:'Session Pro · 4h',a:-28,d:'17 juin'},{t:'Session Starter · 3h',a:-12,d:'15 juin'}]);
+const eur=n=>Math.abs(n).toFixed(2).replace('.',',')+' €';
+function renderCredits(){
+  const p=gid('creditPill');if(p)p.textContent=Math.round(credits)+' €';
+  const b=gid('creditBig');if(b)b.textContent=credits.toFixed(2).replace('.',',')+' €';
+  const tl=gid('txList');
+  if(tl)tl.innerHTML=txs.map(x=>'<div class="tx-row"><div><div style="font-weight:500">'+x.t+'</div><div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--grey);margin-top:3px">'+x.d+'</div></div><div class="tx-amt '+(x.a>=0?'pos':'neg')+'" style="font-family:\'Space Mono\',monospace;font-weight:700">'+(x.a>=0?'+':'−')+eur(x.a)+'</div></div>').join('');
+}
+function recharge(a){credits+=a;txs.unshift({t:'Recharge',a:a,d:"aujourd'hui"});LSset('sf_credits',credits);LSset('sf_txs',txs);renderCredits();pushNotif('credit','Recharge de '+a+'€ confirmée — nouveau solde '+Math.round(credits)+'€.');toast('+'+a+'€ ajoutés à ton solde');}
+
+/* ── RECHARGE AUTO ── */
+let auto=LS('sf_auto',{on:false,thresh:10,amount:50});
+function setAuto(on){auto.on=on;LSset('sf_auto',auto);syncAuto();}
+function syncAuto(){
+  document.querySelectorAll('#autoSeg button').forEach(b=>b.classList.toggle('on',(b.dataset.v==='on')===auto.on));
+  const c=gid('autoCfg');if(c){c.style.opacity=auto.on?'1':'.4';c.style.pointerEvents=auto.on?'auto':'none';}
+  const t=gid('autoThresh'),m=gid('autoAmount');if(t)t.value=auto.thresh;if(m)m.value=auto.amount;
+}
+['autoThresh','autoAmount'].forEach(id=>{const e=gid(id);if(e)e.onchange=()=>{auto.thresh=+gid('autoThresh').value||0;auto.amount=+gid('autoAmount').value||0;LSset('sf_auto',auto);toast('Recharge auto mise à jour');};});
+
+/* ── NOTIFICATIONS ── */
+let notifs=LS('sf_notifs',[
+  {ic:'⏳',cls:'fi-warn',t:'Ta session #4821 se termine dans 12 min — pense à sauvegarder.',time:'il y a 3 min',unread:true},
+  {ic:'🎬',cls:'fi-ok',t:'Rendu « intro_anim » terminé — 120 frames, vidéo prête.',time:'il y a 28 min',unread:true},
+  {ic:'€',cls:'fi-info',t:'Paiement de 14,00 € confirmé (Pro · 2h).',time:'il y a 1 h',unread:false}
+]);
+const FIBG={'fi-ok':'rgba(61,214,140,0.12)','fi-warn':'rgba(245,181,68,0.14)','fi-info':'var(--cyan-dim)','fi-err':'rgba(247,115,137,0.14)'};
+function renderNotifs(){
+  const list=gid('notifList'),badge=gid('notifBadge');
+  const n=notifs.filter(x=>x.unread).length;
+  badge.textContent=n;badge.classList.toggle('hidden',n===0);
+  list.innerHTML=notifs.length?notifs.map(x=>'<div class="notif-item '+(x.unread?'unread':'')+'"><div class="ni-ico" style="background:'+(FIBG[x.cls]||'var(--cyan-dim)')+'">'+x.ic+'</div><div class="ni-body"><div class="nt">'+x.t+'</div><div class="ntime">'+x.time+'</div></div></div>').join(''):'<div class="notif-empty">Aucune notification</div>';
+}
+function pushNotif(kind,text){const map={credit:['€','fi-info'],render:['🎬','fi-ok'],session:['⏳','fi-warn']},m=map[kind]||['•','fi-info'];notifs.unshift({ic:m[0],cls:m[1],t:text,time:"à l'instant",unread:true});LSset('sf_notifs',notifs);renderNotifs();}
+gid('notifBtn').onclick=e=>{e.stopPropagation();gid('notifPop').classList.toggle('open');};
+gid('notifReadAll').onclick=()=>{notifs.forEach(x=>x.unread=false);LSset('sf_notifs',notifs);renderNotifs();};
+document.addEventListener('click',e=>{const p=gid('notifPop');if(p&&p.classList.contains('open')&&!e.target.closest('.notif-wrap'))p.classList.remove('open');});
+
+/* ── FAVORIS ── */
+let favs=LS('sf_favs',[{tier:'pro',tpl:'ml',hours:4},{tier:'starter',tpl:'render',hours:2}]);
+function favPrice(tier){const el=document.querySelector('.tier[data-tier="'+tier+'"]');return el?+el.dataset.price:(tier==='pro'?7:4);}
+function renderFavs(){
+  const row=gid('favRow'),cnt=gid('favCount');if(!row)return;
+  if(cnt)cnt.textContent=favs.length+' enregistré'+(favs.length>1?'s':'');
+  row.innerHTML=favs.length?favs.map((f,i)=>'<div class="fav-chip"><div class="fc-main"><div class="fc-name">'+cap(f.tier)+' · '+tplName(f.tpl)+'</div><div class="fc-sub">'+f.hours+'h · ≈ '+(favPrice(f.tier)*f.hours)+'€</div></div><button class="btn btn-primary btn-sm" onclick="applyFavorite('+i+')">Réserver</button><button class="fav-x" onclick="removeFavorite('+i+')" title="Retirer">✕</button></div>').join(''):'<div class="fav-empty">Aucun favori. Configure une réservation ci-dessous puis clique « ☆ Favori ».</div>';
+}
+function saveFavorite(){const f={tier:pickedTier,tpl:pickedTpl,hours:pickedHours};if(favs.some(x=>x.tier===f.tier&&x.tpl===f.tpl&&x.hours===f.hours)){toast('Déjà dans tes favoris');return;}favs.unshift(f);LSset('sf_favs',favs);renderFavs();toast('Config enregistrée dans tes favoris ★');}
+function removeFavorite(i){favs.splice(i,1);LSset('sf_favs',favs);renderFavs();}
+function applyFavorite(i){const f=favs[i];pickedTier=f.tier;pickedTpl=f.tpl;pickedHours=f.hours;const tc=document.querySelector('.tier[data-tier="'+f.tier+'"]');if(tc){document.querySelectorAll('.tier').forEach(t=>t.classList.remove('picked'));tc.classList.add('picked');pickedPrice=+tc.dataset.price;}renderTemplates();if(typeof updateDuration==='function')updateDuration();updateCheckout();goView('reserve');toast('Favori chargé — choisis une heure de début');}
+
+/* ── CONSOMMATION (graphiques) ── */
+function miniBars(elId,data,labels,unit,accent){
+  const W=520,H=190,pad=26,max=Math.max(...data)*1.15||1,gap=(W-pad*2)/data.length,bw=gap*0.5;
+  let bars='',xl='',grid='';
+  for(let i=0;i<=4;i++){const y=pad+(H-pad*2)*(i/4);grid+='<line x1="'+pad+'" y1="'+y+'" x2="'+(W-pad)+'" y2="'+y+'" stroke="var(--border-soft)" stroke-width="1"/>';}
+  data.forEach((v,i)=>{const hh=(v/max)*(H-pad*2),x=pad+gap*i+(gap-bw)/2,y=H-pad-hh;bars+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+hh+'" rx="3" fill="'+(i===data.length-1?'var(--cyan)':accent)+'"><title>'+v+unit+'</title></rect>';xl+='<text x="'+(x+bw/2)+'" y="'+(H-pad+15)+'" text-anchor="middle" font-family="\'Space Mono\',monospace" font-size="9" fill="var(--grey)">'+labels[i]+'</text>';});
+  const el=gid(elId);if(el)el.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block">'+grid+bars+xl+'</svg>';
+}
+function renderUsage(){
+  miniBars('usageHours',[38,52,61,74,69,84],['Jan','Fév','Mar','Avr','Mai','Jun'],'h','rgba(79,124,255,0.4)');
+  miniBars('usageSpend',[266,364,427,518,483,588],['Jan','Fév','Mar','Avr','Mai','Jun'],'€','rgba(99,102,241,0.45)');
+  const env=[['IA & LLM',58],['Rendu 3D & VFX',22],['IA générative',12],['Calcul scientifique',8]],mx=58,box=gid('usageByEnv');
+  if(box)box.innerHTML=env.map(e=>'<div style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:7px"><span>'+e[0]+'</span><span style="font-family:\'Space Mono\',monospace;color:var(--text-dim)">'+e[1]+'%</span></div><div style="height:7px;background:var(--panel-2);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+(e[1]/mx*100)+'%;background:linear-gradient(90deg,var(--cyan),var(--violet));border-radius:4px"></div></div></div>').join('');
+}
+
+/* ── AIDE & SUPPORT ── */
+gid('helpFab').onclick=()=>gid('helpPanel').classList.toggle('open');
+gid('helpClose').onclick=()=>gid('helpPanel').classList.remove('open');
+document.querySelectorAll('#helpBody .faq-q').forEach(q=>q.onclick=()=>q.parentElement.classList.toggle('open'));
+function helpSend(){const i=gid('helpInput');if(!i.value.trim())return;toast('Message envoyé — réponse par email sous 2h');i.value='';}
+gid('helpSend').onclick=helpSend;
+gid('helpInput').addEventListener('keydown',e=>{if(e.key==='Enter')helpSend();});
+
+/* ── INIT ── */
+renderCredits();renderNotifs();renderFavs();renderUsage();syncAuto();
+</script>
+</body>
+</html>
